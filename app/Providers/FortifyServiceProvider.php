@@ -48,7 +48,7 @@ class FortifyServiceProvider extends ServiceProvider
             if ($user && Hash::check($request->password, $user->password)) {
                 return $user;
             }
-
+            return false;
         });
 
         RateLimiter::for('login', function (Request $request) {
