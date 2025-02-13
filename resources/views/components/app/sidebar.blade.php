@@ -24,7 +24,7 @@
 
                 <div class="flex items-center px-5 space-x-2">
                     <a href="{{ route('dashboard') }}" class="flex justify-center items-center py-4 pl-0.5 space-x-1 font-bold text-zinc-900 text-xl dark:text-zinc-100" wire:navigate>
-                        <x-app.logo-icon class="w-auto h-7" />
+                        <x-app.logo-icon class="w-auto h-7 mr-2" />
                         {{ config('app.name') }}
                     </a>
                 </div>
@@ -40,10 +40,10 @@
 
                 <div class="flex flex-col justify-start items-center px-4 space-y-1.5 w-full h-full text-slate-600 dark:text-zinc-400">
                     <x-app.sidebar-link href="{{ route('dashboard') }}" icon="phosphor-house-duotone"
-                                        :active="Request::is('/dashboard')" wire:navigate>
+                                        :active="Request::is('/dashboard' )" wire:navigate>
                         Dashboard
                     </x-app.sidebar-link>
-                    <x-app.sidebar-dropdown text="Karyawan" icon="phosphor-users-four" id="karyawans"
+                    <x-app.sidebar-dropdown text="Master Data" icon="phosphor-stack-duotone" id="data"
                                             :active="(Request::is('karyawans'))"
                                             :open="(Request::is('karyawans') || Request::is('payrolls')) ? '1' : '0'">
                         <x-app.sidebar-link href="{{ route('dashboard') }}" icon="phosphor-users-four-duotone"
