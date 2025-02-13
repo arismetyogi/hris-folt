@@ -8,6 +8,7 @@ use App\Actions\Fortify\UpdateUserPassword;
 use App\Actions\Fortify\UpdateUserProfileInformation;
 use App\Models\User;
 use Illuminate\Cache\RateLimiting\Limit;
+use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\RateLimiter;
@@ -49,6 +50,19 @@ class FortifyServiceProvider extends ServiceProvider
                 return $user;
             }
             return false;
+        });
+
+        // override confirmPassword from fortify since we are using custom authentication logic above
+        Fortify::confirmPasswordsUsing(function (Authenticatable $user, string $password) {
+            if (!Hash::check($password, $user->password)) {
+                throw ValidationException::withMessages([
+                    'password' => 'The provided password does not match our records.',
+                ]);
+            }
+
+            session(['auth.password_confirmed_at' => time()]); // Store password confirmation timestamp
+
+            return true;
         });
 
         RateLimiter::for('login', function (Request $request) {
