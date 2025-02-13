@@ -4,9 +4,10 @@ namespace Database\Seeders;
 
 use App\Enums\Roles;
 use App\Models\User;
-// use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Carbon\Carbon;
 use Illuminate\Database\Seeder;
+
+// use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 
 class DatabaseSeeder extends Seeder
 {
@@ -31,7 +32,7 @@ class DatabaseSeeder extends Seeder
 //            JabatanSeeder::class,
 //            SubjabatanSeeder::class,
 //
-//            UnitBisnisSeeder::class,
+            UnitBisnisSeeder::class,
 //            ApotekSeeder::class,
         ]);
 
@@ -42,12 +43,14 @@ class DatabaseSeeder extends Seeder
             'username' => 'suadmin',
             'email' => 'suadmin@admin.com',
             'branch_id' => 52,
+            'is_active' => true,
         ])->assignRole(Roles::SuperAdmin);
 
         User::factory()->create([
             'name' => 'Admin',
             'username' => 'admin',
             'email' => 'admin@admin.com',
+            'is_active' => true,
         ])->assignRole(Roles::Admin);
 
         User::factory(26)->unverified()->create();

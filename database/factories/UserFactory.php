@@ -29,11 +29,12 @@ class UserFactory extends Factory
     {
         return [
             'name' => fake()->name(),
-            'username' => fake()->unique()->userName(),
+            'username' => fake()->unique()->username(),
             'email' => fake()->unique()->safeEmail(),
             'email_verified_at' => now(),
-            'password' => static::$password ??= Hash::make('password'),
-            'branch_id' => fake()->numberBetween(1, UnitBisnis::count()),
+            'password' => static::$password ??= bcrypt('password'),
+            'branch_id' => fake()->randomNumber(1, UnitBisnis::count()),
+            'is_active' => fake()->boolean(),
             'two_factor_secret' => null,
             'two_factor_recovery_codes' => null,
             'remember_token' => Str::random(10),

@@ -2,9 +2,9 @@
 
 namespace App\Models;
 
- use Illuminate\Contracts\Auth\MustVerifyEmail;
+// use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Fortify\TwoFactorAuthenticatable;
@@ -17,7 +17,11 @@ class User extends Authenticatable implements MustVerifyEmail
     use HasApiTokens;
 
     /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasFactory, HasProfilePhoto, Notifiable, TwoFactorAuthenticatable, HasRoles;
+    use HasFactory;
+    use HasProfilePhoto;
+    use Notifiable;
+    use TwoFactorAuthenticatable;
+    use HasRoles;
 
     /**
      * The attributes that are mass assignable.
@@ -26,9 +30,9 @@ class User extends Authenticatable implements MustVerifyEmail
      */
     protected $fillable = [
         'name',
-        'username',
         'email',
         'password',
+        'username',
         'branch_id',
         'is_active',
     ];
@@ -66,10 +70,5 @@ class User extends Authenticatable implements MustVerifyEmail
             'password' => 'hashed',
             'is_active' => 'boolean',
         ];
-    }
-
-    public function unitBisnis(): BelongsTo
-    {
-        return $this->belongsTo(UnitBisnis::class);
     }
 }

@@ -16,7 +16,7 @@
             @csrf
 
             <div>
-                <x-label for="creds" value="{{ __('Email') }}" />
+                <x-label for="creds" value="{{ __('Username / Email') }}" />
                 <x-input id="creds" class="block mt-1 w-full" type="text" name="creds" :value="old('username')" required autofocus autocomplete="username" />
             </div>
 

@@ -14,11 +14,11 @@ return new class extends Migration
         Schema::create('users', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->string('username')->unique();
+            $table->string('username');
             $table->string('email')->unique();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
-            $table->unsignedBigInteger('branch_id')->nullable();
+            $table->integer('branch_id')->nullable();
             $table->boolean('is_active')->default(false);
             $table->rememberToken();
             $table->foreignId('current_team_id')->nullable();

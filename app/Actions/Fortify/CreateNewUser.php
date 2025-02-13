@@ -2,6 +2,7 @@
 
 namespace App\Actions\Fortify;
 
+use App\Enums\Roles;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
@@ -31,7 +32,7 @@ class CreateNewUser implements CreatesNewUsers
             'name' => $input['name'],
             'username' => $input['username'],
             'email' => $input['email'],
-            'password' => Hash::make($input['password']),
-        ]);
+            'password' => bcrypt($input['password']),
+        ])->assignRole(Roles::User->value);
     }
 }

@@ -48,16 +48,17 @@ class FortifyServiceProvider extends ServiceProvider
             if ($user && Hash::check($request->password, $user->password)) {
                 return $user;
             }
+
         });
 
         RateLimiter::for('login', function (Request $request) {
             $throttleKey = Str::transliterate(Str::lower($request->input(Fortify::username())).'|'.$request->ip());
 
-            return Limit::perMinute(3)->by($throttleKey);
+            return Limit::perMinute(5)->by($throttleKey);
         });
 
         RateLimiter::for('two-factor', function (Request $request) {
-            return Limit::perMinute(3)->by($request->session()->get('login.id'));
+            return Limit::perMinute(5)->by($request->session()->get('login.id'));
         });
     }
 }
