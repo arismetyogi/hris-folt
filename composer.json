@@ -10,11 +10,13 @@
     "license": "MIT",
     "require": {
         "php": "^8.2",
+        "laravel/folio": "^1.1",
         "laravel/framework": "^11.31",
         "laravel/jetstream": "^5.3",
         "laravel/sanctum": "^4.0",
         "laravel/tinker": "^2.9",
         "livewire/livewire": "^3.0",
+        "livewire/volt": "^1.6",
         "spatie/laravel-permission": "^6.13",
         "wire-elements/modal": "^2.0"
     },
