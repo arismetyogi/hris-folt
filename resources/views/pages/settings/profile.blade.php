@@ -88,6 +88,12 @@ new class extends Component implements HasForms {
         $user = auth()->user();
 
         if ($this->avatar) {
+            // Delete old avatar if exists
+            if ($user->profile_photo_path) {
+                Storage::disk('public')->delete($user->profile_photo_path);
+            }
+
+            // Store new avatar
             $path = $this->avatar->store('profile-photos', 'public');
             $user->profile_photo_path = $path;
             $user->save();
@@ -108,15 +114,14 @@ new class extends Component implements HasForms {
 
     public function deleteAvatar(): void
     {
-        if (is_null(auth()->user()->profile_photo_path)) {
-            return;
+        $user = auth()->user();
+
+        if ($user->profile_photo_path) {
+            Storage::disk('public')->delete($user->profile_photo_path);
+            $user->forceFill([
+                'profile_photo_path' => null,
+            ])->save();
         }
-
-        Storage::disk('public')->delete(auth()->user()->profile_photo_path);
-
-        auth()->user()->forceFill([
-            'profile_photo_path' => null,
-        ])->save();
 
         $this->dispatch('refresh-avatar');
     }
@@ -147,43 +152,32 @@ new class extends Component implements HasForms {
         <div class="relative w-full">
             <form wire:submit="save" class="w-fulll max-w-lg">
                 <div class="relative flex flex-col mt-5 lg:px-10">
-                    <div x-data="{ avatarPreview: @entangle('avatarPreview') }" class="col-span-6 sm:col-span-4">
-                        <!-- Profile Photo File Input -->
-                        <input type="file" id="avatar" class="hidden"
-                               wire:model.live="avatar"
-                               x-ref="avatar"
+                    <div x-data="{ avatarPreview: @entangle('avatarPreview') }"
+                         class="flex justify-center items-center">
+                        <!-- Hidden File Input -->
+                        <input type="file" id="avatar" class="hidden" wire:model.live="avatar" x-ref="avatar"
                                x-on:change="
-                    const reader = new FileReader();
-                    reader.onload = (e) => {
-                        avatarPreview = e.target.result;
-                    };
-                    reader.readAsDataURL($refs.avatar.files[0]);
-               "/>
+                const reader = new FileReader();
+                reader.onload = (e) => { avatarPreview = e.target.result; };
+                reader.readAsDataURL($refs.avatar.files[0]);
+           "/>
 
-                        <x-label for="avatar" value="{{ __('Avatar') }}"/>
+                        <!-- Avatar Frame -->
+                        <div class="relative w-24 h-24">
+                            <!-- Delete Avatar Button -->
+                            @if ($this->canManageProfilePhotos && Auth::user()->profile_photo_path)
+                                <button type="button" wire:click="deleteAvatar"
+                                        class="absolute top-0 right-0 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs">
+                                    ✕
+                                </button>
+                            @endif
 
-                        <!-- Current Profile Photo -->
-                        <div class="mt-2" x-show="!avatarPreview">
-                            <img src="{{ $this->profilePhotoUrl }}" alt="{{ Auth::user()->name }}"
-                                 class="rounded-full h-20 w-20 object-cover">
+                            <!-- Avatar Image (Click to Change) -->
+                            <div class="rounded-full w-24 h-24 bg-cover bg-no-repeat bg-center cursor-pointer"
+                                 x-bind:style="'background-image: url(\'' + (avatarPreview || '{{ $this->profilePhotoUrl }}') + '\');'"
+                                 x-on:click.prevent="$refs.avatar.click()">
+                            </div>
                         </div>
-
-                        <!-- New Profile Photo Preview -->
-                        <div class="mt-2" x-show="avatarPreview" style="display: none;">
-            <span class="block rounded-full w-20 h-20 bg-cover bg-no-repeat bg-center"
-                  x-bind:style="'background-image: url(\'' + avatarPreview + '\');'">
-            </span>
-                        </div>
-
-                        <x-secondary-button class="mt-2 mr-2" type="button" x-on:click.prevent="$refs.avatar.click()">
-                            {{ __('Select A New Photo') }}
-                        </x-secondary-button>
-
-                        @if ($this->canManageProfilePhotos && Auth::user()->profile_photo_path)
-                            <x-secondary-button type="button" class="mt-2" wire:click="deleteAvatar">
-                                {{ __('Remove Photo') }}
-                            </x-secondary-button>
-                        @endif
 
                         <x-input-error for="avatar" class="mt-2"/>
                     </div>
@@ -195,7 +189,7 @@ new class extends Component implements HasForms {
                     </div>
                 </div>
 
-        </form>
+            </form>
 
             <div class="mt-10 w-full max-w-lg">
                 @livewire('profile.logout-other-browser-sessions-form')
