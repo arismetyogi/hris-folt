@@ -43,7 +43,7 @@
                                         :active="Request::is('/dashboard' )" wire:navigate>
                         Dashboard
                     </x-app.sidebar-link>
-                    <x-app.sidebar-dropdown text="Master Data" icon="phosphor-stack-duotone" id="data"
+                    <x-app.sidebar-dropdown text="Karyawan" icon="phosphor-users-four-duotone" id="karyawan"
                                             :active="(Request::is('karyawans'))"
                                             :open="(Request::is('karyawans') || Request::is('payrolls')) ? '1' : '0'">
                         <x-app.sidebar-link href="{{ route('dashboard') }}" icon="phosphor-users-four-duotone"

@@ -1,4 +1,10 @@
-<x-app-layout>
+<x-layouts.app>
+
+    <x-app.heading
+        title="Dashboard"
+        description="Welcome to an example application dashboard. Find more resources below."
+        :border="false"
+    />
 
     <div class="py-12">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
@@ -7,11 +13,6 @@
 
                     <x-app.alert id="dashboard_alert" class="hidden lg:flex">This is the dashboard where users can manage settings and access features.</x-app.alert>
 
-                    <x-app.heading
-                        title="Dashboard"
-                        description="Welcome to an example application dashboard. Find more resources below."
-                        :border="false"
-                    />
 
                     <div class="flex flex-col w-full mt-5 space-y-5 md:flex-row md:space-y-0 md:mb-0 md:space-x-5">
                         <x-app.dashboard-card
@@ -40,4 +41,4 @@
             </div>
         </div>
     </div>
-</x-app-layout>
+</x-layouts.app>

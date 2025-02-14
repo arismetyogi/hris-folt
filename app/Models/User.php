@@ -3,8 +3,10 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+use App\Enums\Roles;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Fortify\TwoFactorAuthenticatable;
@@ -70,5 +72,22 @@ class User extends Authenticatable implements MustVerifyEmail
             'password' => 'hashed',
             'is_active' => 'boolean',
         ];
+    }
+
+    public function isAdmin()
+    {
+        // return if the user has a role of admin
+        return $this->hasRole(Roles::Admin->value);
+    }
+
+    public function isSuperAdmin()
+    {
+        // return if the user has a role of admin
+        return $this->hasRole(Roles::SuperAdmin->value);
+    }
+
+    public function unitBisnis(): BelongsTo
+    {
+        return $this->belongsTo(UnitBisnis::class);
     }
 }
