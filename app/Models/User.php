@@ -75,7 +75,7 @@ class User extends Authenticatable implements MustVerifyEmail
         ];
     }
 
-    public function avatar()
+    public function avatar(): string
     {
         return Storage::url($this->profile_photo_path);
     }
@@ -99,6 +99,6 @@ class User extends Authenticatable implements MustVerifyEmail
 
     public function unitBisnis(): BelongsTo
     {
-        return $this->belongsTo(UnitBisnis::class);
+        return $this->belongsTo(UnitBisnis::class, 'branch_id', 'id');
     }
 }

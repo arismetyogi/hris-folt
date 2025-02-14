@@ -1,13 +1,15 @@
 import defaultTheme from 'tailwindcss/defaultTheme';
 import forms from '@tailwindcss/forms';
 import typography from '@tailwindcss/typography';
+import colors from "tailwindcss/colors.js";
 
 /** @type {import('tailwindcss').Config} */
 export default {
     darkMode: 'class',
 
     presets: [
-        require('./vendor/wireui/wireui/tailwind.config.js')
+        require('./vendor/wireui/wireui/tailwind.config.js'),
+        require("./vendor/power-components/livewire-powergrid/tailwind.config.js"),
     ],
     content: [
         './vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php',
@@ -28,6 +30,10 @@ export default {
             fontFamily: {
                 sans: ['Inter', ...defaultTheme.fontFamily.sans],
             },
+            colors: {
+                'pg-primary': colors.zinc,
+                'pg-secondary': colors.emerald,
+            }
         },
     },
 

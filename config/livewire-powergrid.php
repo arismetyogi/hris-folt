@@ -137,6 +137,6 @@ return [
     */
 
     'auto_discover_models_paths' => [
-        app_path('Models'),
+        '\App\Models',
     ],
 ];

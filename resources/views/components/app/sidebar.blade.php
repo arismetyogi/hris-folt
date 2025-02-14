@@ -68,8 +68,8 @@
                         </x-app.sidebar-link>
                     </x-app.sidebar-dropdown>
                     @can(\App\Enums\Permissions::ManageUsers->value)
-                        <x-app.sidebar-link href="{{ route('dashboard') }}" icon="phosphor-users-duotone"
-                                            :active="Request::is( route('dashboard') )" wire:navigate>
+                        <x-app.sidebar-link href="{{ route('users.index') }}" icon="phosphor-users-duotone"
+                                            :active="Request::is( route('users.index') )" wire:navigate>
                             Users
                         </x-app.sidebar-link>
                     @endcan
