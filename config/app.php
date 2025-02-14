@@ -155,6 +155,7 @@ return [
          * Custom Service Providers...
          */
         \App\Providers\HelperServiceProvider::class,
+        \WireUi\ServiceProvider::class,
 
         /*
          * Application Service Providers...

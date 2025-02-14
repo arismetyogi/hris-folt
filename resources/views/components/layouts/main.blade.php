@@ -23,6 +23,7 @@
 @livewireScripts
 @livewire('wire-elements-modal')
 @stack('js')
+@wireUiScripts
 
 <script>
     if (localStorage.getItem("theme") === "dark" ||

@@ -30,5 +30,4 @@
     </div>
 
     <x-banner />
-    {{ $javascript ?? '' }}
 </x-layouts.main>
