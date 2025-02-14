@@ -2,7 +2,7 @@
 <!-- Section 1 -->
 <footer class="pt-10">
     <x-container>
-        <div class="flex flex-wrap items-start justify-between pb-20">
+        <div class="flex flex-wrap items-start justify-between pb-16">
             <a href="#_" class="flex items-center w-auto mt-1 text-lg font-bold transition-all duration-300 ease-out brightness-0 md:w-1/6 hover:brightness-100">
                 <x-app.logo-icon class="flex-shrink-0 w-auto h-8"></x-app.logo-icon>
             </a>
@@ -26,12 +26,6 @@
                             <a href="#_" class="relative inline-block text-black group">
                                 <span class="absolute bottom-0 w-full transition duration-150 ease-out transform -translate-y-1 border-b border-black opacity-0 group-hover:opacity-100 group-hover:translate-y-1"></span>
                                 <span>Documentation</span>
-                            </a>
-                        </li>
-                        <li>
-                            <a href="#_" class="relative inline-block text-black group">
-                                <span class="absolute bottom-0 w-full transition duration-150 ease-out transform -translate-y-1 border-b border-black opacity-0 group-hover:opacity-100 group-hover:translate-y-1"></span>
-                                <span>Pricing</span>
                             </a>
                         </li>
                     </ul>
@@ -89,12 +83,6 @@
                         <li>
                             <a href="#_" class="relative inline-block text-black group">
                                 <span class="absolute bottom-0 w-full transition duration-150 ease-out transform -translate-y-1 border-b border-black opacity-0 group-hover:opacity-100 group-hover:translate-y-1"></span>
-                                <span>Status</span>
-                            </a>
-                        </li>
-                        <li>
-                            <a href="#_" class="relative inline-block text-black group">
-                                <span class="absolute bottom-0 w-full transition duration-150 ease-out transform -translate-y-1 border-b border-black opacity-0 group-hover:opacity-100 group-hover:translate-y-1"></span>
                                 <span>Sitemap</span>
                             </a>
                         </li>
@@ -103,18 +91,6 @@
                 <div class="md:justify-self-end">
                     <h3 class="font-semibold text-black">Contact</h3>
                     <ul class="mt-6 space-y-4 text-sm">
-                        <li>
-                            <a href="#_" class="relative inline-block text-black group">
-                                <span class="absolute bottom-0 w-full transition duration-150 ease-out transform -translate-y-1 border-b border-black opacity-0 group-hover:opacity-100 group-hover:translate-y-1"></span>
-                                <span>Advertising</span>
-                            </a>
-                        </li>
-                        <li>
-                            <a href="#_" class="relative inline-block text-black group">
-                                <span class="absolute bottom-0 w-full transition duration-150 ease-out transform -translate-y-1 border-b border-black opacity-0 group-hover:opacity-100 group-hover:translate-y-1"></span>
-                                <span>Press</span>
-                            </a>
-                        </li>
                         <li>
                             <a href="#_" class="relative inline-block text-black group">
                                 <span class="absolute bottom-0 w-full transition duration-150 ease-out transform -translate-y-1 border-b border-black opacity-0 group-hover:opacity-100 group-hover:translate-y-1"></span>
