@@ -4,7 +4,9 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
     return view('welcome');
-});
+})->name('home');
+
+Route::redirect('admin/login', '/login');
 
 Route::middleware([
     'auth:sanctum',

@@ -23,7 +23,7 @@
                 </button>
 
                 <div class="flex items-center px-5 space-x-2">
-                    <a href="{{ route('dashboard') }}" class="flex justify-center items-center py-4 pl-0.5 space-x-1 font-bold text-zinc-900 text-xl dark:text-zinc-100" wire:navigate>
+                    <a href="{{ route('home') }}" class="flex justify-center items-center py-4 pl-0.5 space-x-1 font-bold text-zinc-900 text-xl dark:text-zinc-100" wire:navigate>
                         <x-app.logo-icon class="w-auto h-7 mr-2" />
                         {{ config('app.name') }}
                     </a>
