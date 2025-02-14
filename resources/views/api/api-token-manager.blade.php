@@ -11,7 +11,7 @@
 
         <x-slot name="form">
             <!-- Token Name -->
-            <div class="col-span-6 sm:col-span-4">
+            <div class="col-span-6">
                 <x-label for="name" value="{{ __('Token Name') }}" />
                 <x-input id="name" type="text" class="mt-1 block w-full" wire:model="createApiTokenForm.name" autofocus />
                 <x-input-error for="name" class="mt-2" />

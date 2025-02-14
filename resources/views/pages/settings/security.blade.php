@@ -6,7 +6,7 @@
     use Filament\Forms\Contracts\HasForms;
     use Filament\Forms\Form;
     use Filament\Notifications\Notification;
-    
+
     middleware('auth');
     name('settings.security');
 
@@ -47,7 +47,7 @@
                 ])
                 ->statePath('data');
         }
-        
+
         public function save(): void
         {
             $state = $this->form->getState();
@@ -70,7 +70,7 @@
 ?>
 
 <x-layouts.app>
-    @volt('settings.security') 
+    @volt('settings.security')
         <div class="relative">
             <x-app.settings-layout
                 title="Security"
@@ -82,6 +82,15 @@
                         <x-button type="submit">Save</x-button>
                     </div>
                 </form>
+
+
+                @if (Laravel\Fortify\Features::canManageTwoFactorAuthentication())
+                    <div class="mt-10 w-full max-w-lg">
+                        @livewire('profile.two-factor-authentication-form')
+                    </div>
+
+                    <x-section-border/>
+                @endif
 
             </x-app.settings-layout>
         </div>
