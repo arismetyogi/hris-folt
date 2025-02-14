@@ -43,7 +43,7 @@
                 <div class="relative z-20 inline-flex">
                     <a href="{{ route('dashboard') }}"
                        class="flex items-center justify-center space-x-3 font-bold text-zinc-900">
-                        <x-app.logo-icon class="w-auto h-8 md:h-9"></x-app.logo-icon>
+                        <x-app.logo-icon class="w-auto h-8 md:h-12"></x-app.logo-icon>
                     </a>
                 </div>
                 <div class="flex justify-end flex-grow md:hidden">
