@@ -87,9 +87,11 @@ final class UserTable extends PowerGridComponent
                 : null)
             ->add('is_active')
             ->add('created_at_formatted', fn(User $model) => Carbon::parse($model->created_at)->format('d/m/Y H:i:s'))
+            ->add('unit_bisnis', fn($user) => e($user->unitBisnis->name ?? null))
             ->add('branch_name', function ($user) use ($options) {
                 return Blade::render('<x-select type="occurrence" :options=$options :modelId=$userId :selected=$selected/>', ['options' => $options, 'userId' => intval($user->id), 'selected' => intval($user->branch_id)]);
-            });
+            })
+            ->add('test');
     }
 
     public function columns(): array
@@ -110,8 +112,9 @@ final class UserTable extends PowerGridComponent
                 ->editOnClick(hasPermission: 'manage-users')
                 ->sortable()
                 ->searchable(),
+            Column::make('Branch', 'unit_bisnis')->hidden()->visibleInExport(true),
 
-            Column::make('Unit Bisnis', 'branch_name'),
+            Column::make('Unit Bisnis', 'branch_name')->visibleInExport(false),
 
             Column::make('Roles', 'roles'),
             Column::make('Permissions', 'permissions'),
@@ -124,6 +127,9 @@ final class UserTable extends PowerGridComponent
 
             Column::make('Created at', 'created_at_formatted', 'created_at')
                 ->sortable(),
+
+            Column::add()
+                ->template(),
 
             Column::action('Action')
         ];
@@ -199,6 +205,8 @@ final class UserTable extends PowerGridComponent
     {
         return [
             'name.*' => ['required', 'string', 'min:3', 'max:130'],
+            'username.*' => ['required', 'string', 'min:5', 'max:130', 'unique:users'],
+            'email.*' => ['required', 'string','email', 'min:8', 'max:130', 'unique:users'],
         ];
     }
 

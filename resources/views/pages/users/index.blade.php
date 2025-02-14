@@ -3,7 +3,7 @@
 use function Laravel\Folio\{middleware, name};
 use Livewire\Volt\Component;
 
-middleware(['auth', 'verified']);
+middleware(['auth', 'verified', 'can:'.\App\Enums\Permissions::ManageUsers->value]);
 name('users.index');
 
 ?>
@@ -16,5 +16,7 @@ name('users.index');
         :border="false"
     />
 
+    <div class="py-12">
     @livewire('user-table')
+    </div>
 </x-layouts.app>
