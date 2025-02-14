@@ -29,8 +29,7 @@ final class UserTable extends PowerGridComponent
         $this->showCheckBox();
 
         return [
-            PowerGrid::exportable('export')
-                ->striped()
+            PowerGrid::exportable('users')
                 ->columnWidth([
                     2 => 30,
                 ])
@@ -46,7 +45,7 @@ final class UserTable extends PowerGridComponent
 
     public function datasource(): Builder
     {
-        return User::query()->with('unitBisnis');
+        return User::query()->with(['unitBisnis', 'roles', 'permissions']);
     }
 
     public function relationSearch(): array
@@ -80,13 +79,15 @@ final class UserTable extends PowerGridComponent
             ->add('username')
             ->add('email')
             ->add('branch_id', fn($user) => intval($user->branch_id))
+            ->add('roles', fn($user) => $user->getRoleNames()->first())
+            ->add('permissions', fn($user) => $user->permissions
+                ? ($user->getAllPermissions()->count() > 2
+                ? $user->getAllPermissions()->first()->name . ' & ' . ($user->getAllPermissions()->count() - 1) . ' others'
+                : $user->getAllPermissions()->implode('name', ' & '))
+                : null)
             ->add('is_active')
             ->add('created_at_formatted', fn(User $model) => Carbon::parse($model->created_at)->format('d/m/Y H:i:s'))
             ->add('branch_name', function ($user) use ($options) {
-                if (is_null($user->branch_id)) {
-                    dd($user);
-                }
-
                 return Blade::render('<x-select type="occurrence" :options=$options :modelId=$userId :selected=$selected/>', ['options' => $options, 'userId' => intval($user->id), 'selected' => intval($user->branch_id)]);
             });
     }
@@ -101,14 +102,19 @@ final class UserTable extends PowerGridComponent
                 ->searchable(),
 
             Column::make('Email', 'email')
+                ->editOnClick(hasPermission: 'manage-users')
                 ->sortable()
                 ->searchable(),
 
             Column::make('Username', 'username')
+                ->editOnClick(hasPermission: 'manage-users')
                 ->sortable()
                 ->searchable(),
 
             Column::make('Unit Bisnis', 'branch_name'),
+
+            Column::make('Roles', 'roles'),
+            Column::make('Permissions', 'permissions'),
 
             Column::add()
                 ->title('Active')
