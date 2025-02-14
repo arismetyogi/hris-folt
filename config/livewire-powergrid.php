@@ -18,9 +18,8 @@ return [
 
     'icon_resources' => [
         'paths' => [
-            // 'default' => 'resources/views/components/icons',
-            // 'outline' => 'vendor/wireui/wireui/resources/views/components/icons/outline',
-            // 'solid'   => 'vendor/wireui/wireui/resources/views/components/icons/solid',
+             'o' => 'vendor\wireui\heroicons\src\views\components\outline',
+             's'   => 'vendor\wireui\heroicons\src\views\components\solid',
         ],
 
         'allowed' => [

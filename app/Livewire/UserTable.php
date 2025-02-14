@@ -5,7 +5,7 @@ namespace App\Livewire;
 use App\Models\UnitBisnis;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Blade;
 use Livewire\Attributes\On;
@@ -21,6 +21,7 @@ use PowerComponents\LivewirePowerGrid\Traits\WithExport;
 final class UserTable extends PowerGridComponent
 {
     use WithExport;
+
     public string $tableName = 'user-table';
 
     public function setUp(): array
@@ -71,21 +72,22 @@ final class UserTable extends PowerGridComponent
 
     public function fields(): PowerGridFields
     {
+        $options = $this->branchSelectOptions();
+
         return PowerGrid::fields()
             ->add('id')
             ->add('name')
             ->add('username')
             ->add('email')
-            ->add('branch_id', fn ($user) => intval($user->branch_id))
+            ->add('branch_id', fn($user) => intval($user->branch_id))
             ->add('is_active')
             ->add('created_at_formatted', fn(User $model) => Carbon::parse($model->created_at)->format('d/m/Y H:i:s'))
-            ->add('branch_name', function ($user) {
-                $options = null;
+            ->add('branch_name', function ($user) use ($options) {
                 if (is_null($user->branch_id)) {
                     dd($user);
                 }
 
-                return Blade::render('< type="occurrence" :options=$options  :userId=$userId  :selected=$selected/>', ['options' => $options, 'userId' => intval($user->id), 'selected' => intval($user->branch_id)]);
+                return Blade::render('<x-select type="occurrence" :options=$options :modelId=$userId :selected=$selected/>', ['options' => $options, 'userId' => intval($user->id), 'selected' => intval($user->branch_id)]);
             });
     }
 
@@ -111,7 +113,7 @@ final class UserTable extends PowerGridComponent
             Column::add()
                 ->title('Active')
                 ->field('is_active')
-                ->toggleable(hasPermission:'manage-users',trueLabel: 'active', falseLabel: 'blocked')
+                ->toggleable(hasPermission: 'manage-users', trueLabel: 'active', falseLabel: 'blocked')
                 ->sortable(),
 
             Column::make('Created at', 'created_at_formatted', 'created_at')
@@ -128,22 +130,20 @@ final class UserTable extends PowerGridComponent
         ];
     }
 
-    #[\Livewire\Attributes\On('edit')]
-    public function edit($rowId): void
-    {
-        $this->js('alert(' . $rowId . ')');
-    }
-
-    public function actions(User $row): array
+    public function actions($row): array
     {
         return [
             Button::add('edit')
-                ->slot('edit')
+                ->icon('o-pencil', [
+                    'class' => '!text-white',
+                ])
                 ->class('bg-blue-500 text-white font-bold py-2 px-2 rounded')
                 ->dispatch('clickToEdit', ['userId' => $row->id, 'userName' => $row->name]),
 
             Button::add('delete')
-                ->slot('delete')
+                ->icon('o-trash', [
+                    'class' => 'text-white',
+                ])
                 ->class('bg-red-500 text-white font-bold py-2 px-2 rounded')
                 ->dispatch('clickToDelete', ['userId' => $row->id, 'userName' => $row->name]),
         ];
@@ -151,7 +151,7 @@ final class UserTable extends PowerGridComponent
 
     public function actionRules($row): array
     {
-       return [
+        return [
 
         ];
     }
@@ -160,15 +160,10 @@ final class UserTable extends PowerGridComponent
     public function bulkDelete(): void
     {
         dd([
-            'userIds'                 => $this->checkboxValues,
-            'confirmationTitle'       => 'Delete user',
+            'userIds' => $this->checkboxValues,
+            'confirmationTitle' => 'Delete user',
             'confirmationDescription' => 'Are you sure you want to delete this user?',
         ]);
-    }
-
-    public function editName(array $data): void
-    {
-        dd('You are editing', $data);
     }
 
     public function onUpdatedToggleable($id, $field, $value): void
@@ -178,20 +173,45 @@ final class UserTable extends PowerGridComponent
         ]);
     }
 
-    public function unitBisnisSelectOptions(): Collection
+    public function branchSelectOptions(): Collection
     {
         return UnitBisnis::all(['id', 'name'])
             ->mapWithKeys(function ($item) {
-            return [
-                $item->id => $item->name,
-            ];
+                return [
+                    $item->id => $item->name,
+                ];
             });
     }
 
-    #[On('unitBisnisChanged')]
-    public function unitBisnisChanged($unitBisnisId, $userId): void
+    #[On('categoryChanged')]
+    public function categoryChanged($branchId, $userId): void
     {
-        dd("category Id: {$unitBisnisId} for Dish id: {$userId}");
+        User::query()->where('id', $userId)->update(['branch_id' => $branchId]);
     }
 
+    public function rules()
+    {
+        return [
+            'name.*' => ['required', 'string', 'min:3', 'max:130'],
+        ];
+    }
+
+    public function onUpdatedEditable(string|int $id, string $field, string $value): void
+    {
+        User::query()->find($id)->update([
+            $field => e($value),
+        ]);
+    }
+
+    #[On('clickToEdit')]
+    public function clickToEdit(int $userId, string $userName): void
+    {
+        $this->js("alert('Editing #{$userId} -  {$userName}')");
+    }
+
+    #[On('clickToDelete')]
+    public function clickToDelete(int $userId, string $userName): void
+    {
+        $this->js("alert('Deleting #{$userId} -  {$userName}')");
+    }
 }
