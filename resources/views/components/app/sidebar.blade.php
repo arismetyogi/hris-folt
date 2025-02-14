@@ -50,6 +50,10 @@
                                             :active="Request::is('karyawans')" wire:navigate>
                             Karyawan
                         </x-app.sidebar-link>
+                        <x-app.sidebar-link href="{{ route('dashboard') }}" icon="phosphor-users-four-duotone"
+                                            :active="Request::is('karyawans')" wire:navigate>
+                            Payrolls
+                        </x-app.sidebar-link>
                     </x-app.sidebar-dropdown>
                     <x-app.sidebar-dropdown text="Master Data" icon="phosphor-stack-duotone" id="data"
                                             :active="(Request::is('data'))"
@@ -63,9 +67,6 @@
                             Apotek
                         </x-app.sidebar-link>
                     </x-app.sidebar-dropdown>
-                    <x-app.sidebar-link
-                        icon="phosphor-pencil-line" active="false">Stories
-                    </x-app.sidebar-link>
                     @can(\App\Enums\Permissions::ManageUsers->value)
                         <x-app.sidebar-link href="{{ route('dashboard') }}" icon="phosphor-users-duotone"
                                             :active="Request::is( route('dashboard') )" wire:navigate>

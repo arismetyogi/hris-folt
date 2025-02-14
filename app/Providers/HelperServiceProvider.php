@@ -35,9 +35,14 @@ class HelperServiceProvider extends ServiceProvider
             return !auth()->guest() && auth()->user()->isAdmin();
         });
 
-        //@subscriber directives
+        //@superadmin directives
         Blade::if('superadmin', function () {
             return !auth()->guest() && auth()->user()->isSuperAdmin();
+        });
+
+        //@active directives
+        Blade::if('active', function () {
+            return !auth()->guest() && auth()->user()->isActive();
         });
 
         // home directives

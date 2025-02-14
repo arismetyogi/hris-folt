@@ -92,6 +92,11 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this->hasRole(Roles::SuperAdmin->value);
     }
 
+    public function isActive()
+    {
+        return $this->is_active;
+    }
+
     public function unitBisnis(): BelongsTo
     {
         return $this->belongsTo(UnitBisnis::class);
