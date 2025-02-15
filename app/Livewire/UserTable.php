@@ -2,6 +2,7 @@
 
 namespace App\Livewire;
 
+use App\Enums\Permissions;
 use App\Models\UnitBisnis;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Builder;
@@ -91,7 +92,13 @@ final class UserTable extends PowerGridComponent
             ->add('branch_name', function ($user) use ($options) {
                 return Blade::render('<x-select type="occurrence" :options=$options :modelId=$userId :selected=$selected/>', ['options' => $options, 'userId' => intval($user->id), 'selected' => intval($user->branch_id)]);
             })
-            ->add('test');
+            ->add('test')
+            ->add('action', function (User $model) {
+                return view('livewire.action-dropdown', [
+                    'model' => $model,
+                    'actions' => $this->getActions(),
+                ])->render();
+            });
     }
 
     public function columns(): array
@@ -99,37 +106,39 @@ final class UserTable extends PowerGridComponent
         return [
             Column::make('ID', 'id'),
             Column::make('Name', 'name')
-                ->editOnClick(hasPermission: 'manage-users')
+                ->editOnClick(hasPermission: Permissions::ManageUsers->value)
                 ->sortable()
                 ->searchable(),
 
             Column::make('Email', 'email')
-                ->editOnClick(hasPermission: 'manage-users')
+                ->editOnClick(hasPermission: Permissions::ManageUsers->value)
                 ->sortable()
                 ->searchable(),
 
             Column::make('Username', 'username')
-                ->editOnClick(hasPermission: 'manage-users')
+                ->editOnClick(hasPermission: Permissions::ManageUsers->value)
                 ->sortable()
                 ->searchable(),
-            Column::make('Branch', 'unit_bisnis')->hidden()->visibleInExport(true),
 
             Column::make('Unit Bisnis', 'branch_name')->visibleInExport(false),
 
+            Column::make('Branch', 'unit_bisnis')->hidden()->visibleInExport(true),
+
             Column::make('Roles', 'roles'),
+
             Column::make('Permissions', 'permissions'),
 
             Column::add()
                 ->title('Active')
                 ->field('is_active')
-                ->toggleable(hasPermission: 'manage-users', trueLabel: 'active', falseLabel: 'blocked')
+                ->toggleable(hasPermission: Permissions::ManageUsers->value, trueLabel: 'active', falseLabel: 'blocked')
                 ->sortable(),
 
             Column::make('Created at', 'created_at_formatted', 'created_at')
                 ->sortable(),
 
-            Column::add()
-                ->template(),
+            Column::make('Actions', 'action')
+                ->contentClasses('text-center'),
 
             Column::action('Action')
         ];
@@ -145,19 +154,19 @@ final class UserTable extends PowerGridComponent
     public function actions($row): array
     {
         return [
-            Button::add('edit')
-                ->icon('o-pencil', [
-                    'class' => '!text-white',
-                ])
-                ->class('bg-blue-500 text-white font-bold py-2 px-2 rounded')
-                ->dispatch('clickToEdit', ['userId' => $row->id, 'userName' => $row->name]),
-
-            Button::add('delete')
-                ->icon('o-trash', [
-                    'class' => 'text-white',
-                ])
-                ->class('bg-red-500 text-white font-bold py-2 px-2 rounded')
-                ->dispatch('clickToDelete', ['userId' => $row->id, 'userName' => $row->name]),
+//            Button::add('edit')
+//                ->icon('o-pencil', [
+//                    'class' => '!text-white',
+//                ])
+//                ->class('bg-blue-500 text-white font-bold py-2 px-2 rounded')
+//                ->dispatch('clickToEdit', ['userId' => $row->id, 'userName' => $row->name]),
+//
+//            Button::add('delete')
+//                ->icon('o-trash', [
+//                    'class' => 'text-white',
+//                ])
+//                ->class('bg-red-500 text-white font-bold py-2 px-2 rounded')
+//                ->dispatch('clickToDelete', ['userId' => $row->id]),
         ];
     }
 
@@ -167,6 +176,28 @@ final class UserTable extends PowerGridComponent
 
         ];
     }
+
+    public function getActions(): array
+    {
+        return [
+            'main' => [
+                'edit' => ['type' => 'link', 'label' => 'Edit', 'route' => 'users.index'],
+                'updateRole' => ['type' => 'link', 'label' => 'Update Role', 'route' => 'users.index'],
+                'updatePermissions' => ['type' => 'link', 'label' => 'Update Permissions', 'route' => 'users.index'],
+            ],
+            'toggle' => [
+                'toggleActive' => ['label' => 'Toggle Active Status'],
+            ],
+            'danger' => [
+                'delete' => ['label' => 'Delete User', 'class' => 'text-red-700 hover:bg-red-100 hover:text-red-900'],
+            ],
+        ];
+    }
+
+    protected $listeners = [
+        'action::toggleActive' => 'toggleActive',
+        'action::delete' => 'delete',
+    ];
 
     #[On('bulkDelete.{tableName}')]
     public function bulkDelete(): void
@@ -224,8 +255,8 @@ final class UserTable extends PowerGridComponent
     }
 
     #[On('clickToDelete')]
-    public function clickToDelete(int $userId, string $userName): void
+    public function clickToDelete(int $userId): void
     {
-        $this->js("alert('Deleting #{$userId} -  {$userName}')");
+        User::whereKey($userId)->delete();
     }
 }
