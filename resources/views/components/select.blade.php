@@ -1,6 +1,6 @@
 @props(['selected', 'modelId', 'options'])
 <div>
-    <select wire:change="categoryChanged($event.target.value, {{ $modelId }})">
+    <select wire:change="categoryChanged($event.target.value, {{ $modelId }})" class="dark:bg-zinc-800 dark:text-zinc-50 border-none rounded-lg">
         @foreach ($options as $id => $name)
             <option
                 value="{{ $id }}"

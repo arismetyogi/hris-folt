@@ -36,6 +36,7 @@ final class UserTable extends PowerGridComponent
                 ])
                 ->type(Exportable::TYPE_XLS, Exportable::TYPE_CSV),
             PowerGrid::header()
+                ->withoutLoading()
                 ->showToggleColumns()
                 ->showSearchInput(),
             PowerGrid::footer()
@@ -159,7 +160,7 @@ final class UserTable extends PowerGridComponent
     {
         return [
             'main' => [
-                'edit' => ['type' => 'modal', 'label' => 'Edit', 'component' => 'users.edit'],
+                'edit' => ['type' => 'modal', 'label' => 'Edit', 'component' => 'users.create'],
                 'updateRole' => ['type' => 'modal', 'label' => 'Update Role', 'component' => 'users.update-role'],
                 'updatePermissions' => ['type' => 'modal', 'label' => 'Update Permissions', 'component' => 'users.update-permissions'],
             ],
@@ -173,6 +174,7 @@ final class UserTable extends PowerGridComponent
     }
 
     protected $listeners = [
+        'refreshUsersTable' => '$refresh', //refresh table from event
         'action::toggleActive' => 'toggleActive',
         'action::delete' => 'delete',
     ];
