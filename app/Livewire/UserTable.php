@@ -15,6 +15,7 @@ use PowerComponents\LivewirePowerGrid\Column;
 use PowerComponents\LivewirePowerGrid\Components\SetUp\Exportable;
 use PowerComponents\LivewirePowerGrid\Facades\Filter;
 use PowerComponents\LivewirePowerGrid\Facades\PowerGrid;
+use PowerComponents\LivewirePowerGrid\Facades\Rule;
 use PowerComponents\LivewirePowerGrid\PowerGridComponent;
 use PowerComponents\LivewirePowerGrid\PowerGridFields;
 use PowerComponents\LivewirePowerGrid\Traits\WithExport;
@@ -152,7 +153,13 @@ final class UserTable extends PowerGridComponent
     public function actionRules($row): array
     {
         return [
+            Rule::checkbox()
+                ->when(fn ($row) => $row->isSuperAdmin())
+                ->hide(),
 
+            Rule::rows()
+                ->when(fn ($row) => $row->isSuperAdmin())
+                ->hideToggleable(),
         ];
     }
 
@@ -179,11 +186,13 @@ final class UserTable extends PowerGridComponent
     #[On('bulkDelete.{tableName}')]
     public function bulkDelete(): void
     {
-        dd([
-            'userIds' => $this->checkboxValues,
-            'confirmationTitle' => 'Delete user',
-            'confirmationDescription' => 'Are you sure you want to delete this user?',
-        ]);
+        $this->dispatch('openModal', 'bulk-delete-modal',
+             [
+                'checkboxValues' => $this->checkboxValues,
+                'model' => 'User',
+                'tableName' => $this->tableName,
+            ]
+        );
     }
 
     public function onUpdatedToggleable($id, $field, $value): void
