@@ -111,7 +111,6 @@ final class UserTable extends PowerGridComponent
                 ->searchable(),
 
             Column::make('Email', 'email')
-                ->editOnClick(hasPermission: Permissions::ManageUsers->value)
                 ->sortable()
                 ->searchable(),
 
@@ -154,19 +153,7 @@ final class UserTable extends PowerGridComponent
     public function actions($row): array
     {
         return [
-//            Button::add('edit')
-//                ->icon('o-pencil', [
-//                    'class' => '!text-white',
-//                ])
-//                ->class('bg-blue-500 text-white font-bold py-2 px-2 rounded')
-//                ->dispatch('clickToEdit', ['userId' => $row->id, 'userName' => $row->name]),
-//
-//            Button::add('delete')
-//                ->icon('o-trash', [
-//                    'class' => 'text-white',
-//                ])
-//                ->class('bg-red-500 text-white font-bold py-2 px-2 rounded')
-//                ->dispatch('clickToDelete', ['userId' => $row->id]),
+            //
         ];
     }
 

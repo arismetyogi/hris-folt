@@ -1,6 +1,13 @@
-<div x-data="{ open: false }" class="relative inline-block text-left">
+<div x-data="{ open: false, top: 0, left: 0, width: 0 }" class="relative inline-block text-left">
     <div>
-        <button @click="open = !open" type="button"
+        <button @click="
+                    open = !open;
+                    const rect = $el.getBoundingClientRect();
+                    top = rect.bottom + window.scrollY;
+                    left = rect.left;
+                    width = rect.width;
+                "
+                type="button"
                 class="inline-flex justify-center w-full rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:bg-zinc-700 dark:hover:bg-zinc-800 dark:text-gray-100"
                 id="options-menu" aria-haspopup="true" x-bind:aria-expanded="open">
             Actions
@@ -13,19 +20,23 @@
         </button>
     </div>
 
-    <div x-show="open" @click.away="open = false"
-         class="origin-top-right absolute right-0 mt-2 w-56 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 divide-y divide-gray-100 z-50"
-         role="menu" aria-orientation="vertical" aria-labelledby="options-menu">
-        @foreach($actions as $group => $groupActions)
-            <div class="py-1" role="none">
-                @foreach($groupActions as $action => $config)
-                    <button wire:click="callAction('{{ $action }}', {{ json_encode($config['params'] ?? []) }})"
-                            class="block w-full text-left px-4 py-2 text-sm {{ $config['class'] ?? 'text-gray-700 hover:bg-gray-100 hover:text-gray-900' }}"
-                            role="menuitem">
-                        {{ $config['label'] }}
-                    </button>
-                @endforeach
-            </div>
-        @endforeach
-    </div>
+    <template x-teleport="body">
+        <div x-show="open"
+             @click.away="open = false"
+             class="absolute w-56 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 divide-y divide-gray-100 z-50"
+             x-bind:style="'top:' + top + 'px; left:' + left + 'px; min-width:' + width + 'px;'"
+             role="menu" aria-orientation="vertical" aria-labelledby="options-menu">
+            @foreach($actions as $group => $groupActions)
+                <div class="py-1" role="none">
+                    @foreach($groupActions as $action => $config)
+                        <button wire:click="callAction('{{ $action }}', {{ json_encode($config['params'] ?? []) }})"
+                                class="block w-full text-left px-4 py-2 text-sm {{ $config['class'] ?? 'text-gray-700 hover:bg-gray-100 hover:text-gray-900' }}"
+                                role="menuitem">
+                            {{ $config['label'] }}
+                        </button>
+                    @endforeach
+                </div>
+            @endforeach
+        </div>
+    </template>
 </div>
