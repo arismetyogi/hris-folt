@@ -165,18 +165,18 @@ final class UserTable extends PowerGridComponent
                 'updatePermissions' => ['type' => 'modal', 'label' => 'Update Permissions', 'component' => 'users.update-permissions'],
             ],
             'toggle' => [
-                'toggleActive' => ['label' => 'Toggle Active Status'],
+                'toggleActive' => ['type' => 'action', 'component' => 'action-modal', 'model' => 'User', 'action' => 'toggle', 'attribute' => 'is_active', 'label' => 'Toggle Active Status'],
             ],
             'danger' => [
-                'delete' => ['label' => 'Delete User', 'class' => 'text-red-700 hover:bg-red-100 hover:text-red-900'],
+                'deleteRow' => ['type' => 'action', 'component' => 'action-modal', 'model' => 'User', 'action' => 'delete', 'label' => 'Delete User', 'class' => 'text-red-700 hover:bg-red-100 hover:text-red-900'],
             ],
         ];
     }
 
     protected $listeners = [
         'refreshUsersTable' => '$refresh', //refresh table from event
-        'action::toggleActive' => 'toggleActive',
-        'action::delete' => 'delete',
+        'record-deleted' => '$refresh',
+        'record-updated' => '$refresh',
     ];
 
     #[On('bulkDelete.{tableName}')]
@@ -226,17 +226,5 @@ final class UserTable extends PowerGridComponent
         User::query()->find($id)->update([
             $field => e($value),
         ]);
-    }
-
-    #[On('clickToEdit')]
-    public function clickToEdit(int $userId, string $userName): void
-    {
-        $this->js("alert('Editing #{$userId} -  {$userName}')");
-    }
-
-    #[On('clickToDelete')]
-    public function clickToDelete(int $userId): void
-    {
-        User::whereKey($userId)->confirm()->delete();
     }
 }

@@ -46,13 +46,31 @@
                                role="menuitem">{{ $config['label'] }}</a>
                         @elseif(isset($config['type']) && $config['type'] === 'modal')
                             <button
-                                wire:click="$dispatch('openModal', {component: '{{$config['component']}}', arguments: {id: {{$model->id}}}})"
+                                wire:click="$dispatch(
+                                    'openModal', {
+                                        component: '{{ $config['component'] }}',
+                                        arguments: {
+                                            id: {{ $model->id }}
+                                            }
+                                        }
+                                    )"
                                 class="block w-full text-left px-4 py-2 text-sm {{ $config['class'] ?? 'text-gray-700 hover:bg-gray-100 hover:text-gray-900' }}"
                                 role="menuitem">
                                 {{ $config['label'] }}
                             </button>
-                        @else
-                            <button wire:click="callAction('{{ $action }}', {{ json_encode($config['params'] ?? []) }})"
+                        @elseif(isset($config['action']) && $config['type'] === 'action')
+                            <button
+                                wire:click="$dispatch(
+                                    'openModal', {
+                                        component: '{{ $config['component'] }}',
+                                        arguments: {
+                                            id: {{ $model->id }},
+                                            model: '{{ $config['model'] }}',
+                                            action: '{{ $config['action'] }}'
+                                            @if('action' == 'toggle'), attribute: '{{ $config['attribute'] }}' @endif
+                                            }
+                                        }
+                                    )"
                                     class="block w-full text-left px-4 py-2 text-sm {{ $config['class'] ?? 'text-gray-700 hover:bg-gray-100 hover:text-gray-900' }}"
                                     role="menuitem">
                                 {{ $config['label'] }}
