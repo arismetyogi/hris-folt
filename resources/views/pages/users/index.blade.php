@@ -16,7 +16,7 @@ name('users.index');
         :border="false"
     />
 
-    <div class="py-12 px-8">
+    <div class="py-12">
     @livewire('user-table')
     </div>
 </x-layouts.app>
