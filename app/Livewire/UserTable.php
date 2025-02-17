@@ -164,9 +164,6 @@ final class UserTable extends PowerGridComponent
                 'updateRole' => ['type' => 'modal', 'label' => 'Update Role', 'component' => 'users.update-role'],
                 'updatePermissions' => ['type' => 'modal', 'label' => 'Update Permissions', 'component' => 'users.update-permissions'],
             ],
-            'toggle' => [
-                'toggleActive' => ['type' => 'action', 'component' => 'action-modal', 'model' => 'User', 'action' => 'toggle', 'attribute' => 'is_active', 'label' => 'Toggle Active Status'],
-            ],
             'danger' => [
                 'deleteRow' => ['type' => 'action', 'component' => 'action-modal', 'model' => 'User', 'action' => 'delete', 'label' => 'Delete User', 'class' => 'text-red-700 hover:bg-red-100 hover:text-red-900'],
             ],
