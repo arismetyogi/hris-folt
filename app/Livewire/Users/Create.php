@@ -21,15 +21,12 @@ class Create extends ModalComponent implements HasForms
     {
         $this->user = $id ? User::find($id) : null;
 
-        logger($this->user);
-
         if (!$this->user && $id) {
             abort(404, 'User not found');
         }
 
         $this->data = $this->getUserData();
         $this->form->fill($this->data);
-
     }
 
     private function getUserData(): array
