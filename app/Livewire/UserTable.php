@@ -92,7 +92,6 @@ final class UserTable extends PowerGridComponent
             ->add('branch_name', function ($user) use ($options) {
                 return Blade::render('<x-select type="occurrence" :options=$options :modelId=$userId :selected=$selected/>', ['options' => $options, 'userId' => intval($user->id), 'selected' => intval($user->branch_id)]);
             })
-            ->add('test')
             ->add('action', function (User $model) {
                 return view('livewire.action-dropdown', [
                     'model' => $model,
@@ -138,8 +137,6 @@ final class UserTable extends PowerGridComponent
 
             Column::make('Actions', 'action')
                 ->contentClasses('text-center'),
-
-            Column::action('Action')
         ];
     }
 
@@ -150,12 +147,6 @@ final class UserTable extends PowerGridComponent
         ];
     }
 
-    public function actions($row): array
-    {
-        return [
-            //
-        ];
-    }
 
     public function actionRules($row): array
     {
@@ -168,9 +159,9 @@ final class UserTable extends PowerGridComponent
     {
         return [
             'main' => [
-                'edit' => ['type' => 'link', 'label' => 'Edit', 'route' => 'users.index'],
-                'updateRole' => ['type' => 'link', 'label' => 'Update Role', 'route' => 'users.index'],
-                'updatePermissions' => ['type' => 'link', 'label' => 'Update Permissions', 'route' => 'users.index'],
+                'edit' => ['type' => 'modal', 'label' => 'Edit', 'component' => 'users.edit'],
+                'updateRole' => ['type' => 'modal', 'label' => 'Update Role', 'component' => 'users.update-role'],
+                'updatePermissions' => ['type' => 'modal', 'label' => 'Update Permissions', 'component' => 'users.update-permissions'],
             ],
             'toggle' => [
                 'toggleActive' => ['label' => 'Toggle Active Status'],
@@ -219,7 +210,7 @@ final class UserTable extends PowerGridComponent
         User::query()->where('id', $userId)->update(['branch_id' => $branchId]);
     }
 
-    public function rules()
+    public function rules(): array
     {
         return [
             'name.*' => ['required', 'string', 'min:3', 'max:130'],
@@ -244,6 +235,6 @@ final class UserTable extends PowerGridComponent
     #[On('clickToDelete')]
     public function clickToDelete(int $userId): void
     {
-        User::whereKey($userId)->delete();
+        User::whereKey($userId)->confirm()->delete();
     }
 }

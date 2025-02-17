@@ -3,8 +3,19 @@
         <button @click="
                     open = !open;
                     const rect = $el.getBoundingClientRect();
+                    const screenWidth = window.innerWidth;
+                    const dropdownWidth = 224; // Adjust if needed (w-56 is 224px)
+
+                    // Default left position
+                    let newLeft = rect.left;
+
+                    // If dropdown overflows, align to the right of the button
+                    if (newLeft + dropdownWidth > screenWidth) {
+                        newLeft = screenWidth - dropdownWidth - 16; // 16px padding from edge
+                    }
+
                     top = rect.bottom + window.scrollY;
-                    left = rect.left;
+                    left = newLeft;
                     width = rect.width;
                 "
                 type="button"
@@ -29,11 +40,24 @@
             @foreach($actions as $group => $groupActions)
                 <div class="py-1" role="none">
                     @foreach($groupActions as $action => $config)
-                        <button wire:click="callAction('{{ $action }}', {{ json_encode($config['params'] ?? []) }})"
+                        @if(isset($config['type']) && $config['type'] === 'link')
+                            <a href="{{ route($config['route'], $model) }}"
+                               class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900"
+                               role="menuitem">{{ $config['label'] }}</a>
+                        @elseif(isset($config['type']) && $config['type'] === 'modal')
+                            <button
+                                wire:click="$dispatch('openModal', {component: '{{$config['component']}}', arguments: {id: {{$model->id}})"
                                 class="block w-full text-left px-4 py-2 text-sm {{ $config['class'] ?? 'text-gray-700 hover:bg-gray-100 hover:text-gray-900' }}"
                                 role="menuitem">
-                            {{ $config['label'] }}
-                        </button>
+                                {{ $config['label'] }}
+                            </button>
+                        @else
+                            <button wire:click="callAction('{{ $action }}', {{ json_encode($config['params'] ?? []) }})"
+                                    class="block w-full text-left px-4 py-2 text-sm {{ $config['class'] ?? 'text-gray-700 hover:bg-gray-100 hover:text-gray-900' }}"
+                                    role="menuitem">
+                                {{ $config['label'] }}
+                            </button>
+                        @endif
                     @endforeach
                 </div>
             @endforeach
