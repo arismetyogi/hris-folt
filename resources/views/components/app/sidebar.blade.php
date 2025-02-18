@@ -62,7 +62,7 @@
                                             :active="Request::is('branches')" wire:navigate>
                             Unit Bisnis
                         </x-app.sidebar-link>
-                        <x-app.sidebar-link href="{{ route('dashboard') }}" icon="phosphor-storefront-duotone"
+                        <x-app.sidebar-link href="{{ route('apoteks.index') }}" icon="phosphor-storefront-duotone"
                                             :active="Request::is('apoteks')" wire:navigate>
                             Apotek
                         </x-app.sidebar-link>
