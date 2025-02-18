@@ -20,7 +20,6 @@ class UpdateRole extends ModalComponent implements HasForms
     public ?array $data = [];
 
     public $roles = [];
-    public $selectedRole='';
 
     public static function modalMaxWidth(): string
     {
@@ -61,7 +60,7 @@ class UpdateRole extends ModalComponent implements HasForms
                     ->disabled()
                     ->label('Unit Bisnis'),
                 Select::make('role')
-                    ->options(Role::all()->pluck('name', 'id'))
+                    ->options(Role::all()->pluck('name', 'name'))
                     ->label('Role'),
             ])
             ->statePath('data');
@@ -69,15 +68,15 @@ class UpdateRole extends ModalComponent implements HasForms
 
     public function save(): void
     {
-        $validated =  $this->validate([
-            'selectedRole' => ['sometimes'],
+       $validated =  $this->validate([
+            'data.role' => ['required'],
         ]);
 
-        $this->user->syncRoles($this->selectedRole);
+        $this->user->syncRoles($validated['data']['role']);
 
-        ($validated['selectedRole'])
+        ($validated['data']['role'])
             ? session()->flash('message','Role berhasil diberikan!')
-            : session()->error(title: 'Role gagal diberikan!', position: 'toast-top toast-end', timeout: 2000);
+            : session()->flash('danger', 'Role gagal diberikan!');
         $this->closeModal();
         // refresh Users Page after saving
         $this->dispatch('refreshUsersTable');
