@@ -34,6 +34,7 @@
     <template x-teleport="body">
         <div x-show="open"
              @click.away="open = false"
+             @click="open = false"
              class="absolute w-56 rounded-md shadow-lg bg-white/80 ring-1 ring-black ring-opacity-5 divide-y divide-gray-100/80 z-50"
              x-bind:style="'top:' + top + 'px; left:' + left + 'px; min-width:' + width + 'px;'"
              role="menu" aria-orientation="vertical" aria-labelledby="options-menu">
