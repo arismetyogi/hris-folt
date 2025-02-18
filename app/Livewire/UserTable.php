@@ -26,6 +26,13 @@ final class UserTable extends PowerGridComponent
 
     public string $tableName = 'user-table';
 
+    public bool $showFilters = true;
+
+    public function boot(): void
+    {
+        config(['livewire-powergrid.filter' => 'outside']);
+    }
+
     public function setUp(): array
     {
         $this->showCheckBox();

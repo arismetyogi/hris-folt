@@ -18,10 +18,14 @@ final class ApotekTable extends PowerGridComponent
 {
     public string $tableName = 'apotek-table';
 
+    public bool $showFilters = true;
+
+    public function boot(): void
+    {
+        config(['livewire-powergrid.filter' => 'outside']);
+    }
     public function setUp(): array
     {
-        $this->showCheckBox();
-
         return [
             PowerGrid::exportable('master_apotek')
                 ->columnWidth([
@@ -105,7 +109,7 @@ final class ApotekTable extends PowerGridComponent
                 ->sortable(),
             Column::make('Address', 'address'),
             Column::make('Phone', 'phone'),
-            Column::make('Zip', 'zip'),
+            Column::make('Zip Code  ', 'zip'),
             Column::make('Created at', 'created_at_formatted', 'created_at')
                 ->sortable(),
 
