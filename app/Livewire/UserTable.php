@@ -180,12 +180,14 @@ final class UserTable extends PowerGridComponent
     {
         return [
             'main' => [
-                'edit' => ['type' => 'modal', 'label' => 'Edit', 'component' => 'users.create'],
-                'updateRole' => ['type' => 'modal', 'label' => 'Update Role', 'component' => 'users.update-role'],
-                'updatePermissions' => ['type' => 'modal', 'label' => 'Update Permissions', 'component' => 'users.update-permissions'],
+                'edit' => ['type' => 'modal', 'label' => 'Edit', 'component' => 'users.create', 'function' => 'edit'],
+            ],
+            'secondary' => [
+                'updateRole' => ['type' => 'modal', 'label' => 'Update Role', 'component' => 'users.update-role', 'function' => 'updateRole'],
+                'updatePermissions' => ['type' => 'modal', 'label' => 'Update Permissions', 'component' => 'users.update-permissions', 'function' => 'updatePermissions'],
             ],
             'danger' => [
-                'deleteRow' => ['type' => 'action', 'component' => 'action-modal', 'model' => 'User', 'action' => 'delete', 'label' => 'Delete User', 'class' => 'text-red-700 hover:bg-red-100 hover:text-red-900'],
+                'deleteRow' => ['type' => 'action', 'component' => 'action-modal', 'model' => 'User', 'action' => 'delete', 'label' => 'Delete User', 'class' => 'text-red-700 hover:bg-red-100 hover:text-red-900', 'function' => 'delete'],
             ],
         ];
     }
