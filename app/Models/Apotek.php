@@ -12,7 +12,7 @@ class Apotek extends Model
 
     public function unitBisnis(): BelongsTo
     {
-        return $this->belongsTo(UnitBisnis::class);
+        return $this->belongsTo(UnitBisnis::class, 'branch_id');
     }
 
     public function zip(): BelongsTo
