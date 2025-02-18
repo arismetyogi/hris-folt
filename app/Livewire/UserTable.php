@@ -6,8 +6,8 @@ use App\Enums\Permissions;
 use App\Models\UnitBisnis;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Support\Collection;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Blade;
 use Livewire\Attributes\On;
 use PowerComponents\LivewirePowerGrid\Button;
@@ -78,7 +78,12 @@ final class UserTable extends PowerGridComponent
 
         return PowerGrid::fields()
             ->add('id')
-            ->add('#', fn($row, $index) => $index + 1)
+            ->add('#', function ($row, $index) {
+                $currentPage = $this->page ?? 1; // Get the current page, default to 1
+                $perPage = data_get($this->filters, 'perPage', 10);; // Set your per-page value (adjust if needed)
+
+                return ($currentPage - 1) * $perPage + ($index + 1);
+            })
             ->add('name')
             ->add('username')
             ->add('email')
@@ -86,9 +91,10 @@ final class UserTable extends PowerGridComponent
             ->add('roles', fn($user) => $user->getRoleNames()->first())
             ->add('permissions', fn($user) => $user->permissions
                 ? ($user->getAllPermissions()->count() > 2
-                ? $user->getAllPermissions()->first()->name . ' & ' . ($user->getAllPermissions()->count() - 1) . ' others'
-                : $user->getAllPermissions()->implode('name', ' & '))
+                    ? $user->getAllPermissions()->first()->name . ' & ' . ($user->getAllPermissions()->count() - 1) . ' others'
+                    : $user->getAllPermissions()->implode('name', ' & '))
                 : null)
+            ->add('permissions_details', fn($user) => $user->getAllPermissions()->implode('name', ', '))
             ->add('is_active')
             ->add('created_at_formatted', fn(User $model) => Carbon::parse($model->created_at)->format('d/m/Y H:i:s'))
             ->add('unit_bisnis', fn($user) => e($user->unitBisnis->name ?? null))
@@ -106,7 +112,8 @@ final class UserTable extends PowerGridComponent
     public function columns(): array
     {
         return [
-            Column::make('ID', 'id')
+            Column::make('ID', '#')
+                ->index()
                 ->visibleInExport(false),
             Column::make('No', '#')->hidden()->visibleInExport(true),
             Column::make('Name', 'name')
@@ -129,7 +136,8 @@ final class UserTable extends PowerGridComponent
 
             Column::make('Roles', 'roles'),
 
-            Column::make('Permissions', 'permissions'),
+            Column::make('Permissions', 'permissions')->visibleInExport(false),
+            Column::make('Permissions', 'permissions_details')->hidden()->visibleInExport(true),
 
             Column::add()
                 ->title('Active')
@@ -158,11 +166,11 @@ final class UserTable extends PowerGridComponent
     {
         return [
             Rule::checkbox()
-                ->when(fn ($row) => $row->isSuperAdmin())
+                ->when(fn($row) => $row->isSuperAdmin())
                 ->hide(),
 
             Rule::rows()
-                ->when(fn ($row) => $row->isSuperAdmin())
+                ->when(fn($row) => $row->isSuperAdmin())
                 ->hideToggleable(),
         ];
     }
@@ -191,7 +199,7 @@ final class UserTable extends PowerGridComponent
     public function bulkDelete(): void
     {
         $this->dispatch('openModal', 'bulk-delete-modal',
-             [
+            [
                 'checkboxValues' => $this->checkboxValues,
                 'model' => 'User',
                 'tableName' => $this->tableName,
@@ -227,7 +235,7 @@ final class UserTable extends PowerGridComponent
         return [
             'name.*' => ['required', 'string', 'min:3', 'max:130'],
             'username.*' => ['required', 'string', 'min:5', 'max:130', 'unique:users'],
-            'email.*' => ['required', 'string','email', 'min:8', 'max:130', 'unique:users'],
+            'email.*' => ['required', 'string', 'email', 'min:8', 'max:130', 'unique:users'],
         ];
     }
 
