@@ -78,6 +78,7 @@ final class UserTable extends PowerGridComponent
 
         return PowerGrid::fields()
             ->add('id')
+            ->add('#', fn($row, $index) => $index + 1)
             ->add('name')
             ->add('username')
             ->add('email')
@@ -105,7 +106,9 @@ final class UserTable extends PowerGridComponent
     public function columns(): array
     {
         return [
-            Column::make('ID', 'id'),
+            Column::make('ID', 'id')
+                ->visibleInExport(false),
+            Column::make('No', '#')->hidden()->visibleInExport(true),
             Column::make('Name', 'name')
                 ->editOnClick(hasPermission: Permissions::ManageUsers->value)
                 ->sortable()
@@ -138,6 +141,7 @@ final class UserTable extends PowerGridComponent
                 ->sortable(),
 
             Column::make('Actions', 'action')
+                ->visibleInExport(false)
                 ->contentClasses('text-center'),
         ];
     }
