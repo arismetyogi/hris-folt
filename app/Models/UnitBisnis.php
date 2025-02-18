@@ -21,4 +21,14 @@ class UnitBisnis extends Model
     {
         return $this->hasMany(User::class, 'user.branch_id', 'id');
     }
+
+    public function karyawans(): HasMany
+    {
+        return $this->hasMany(Karyawan::class);
+    }
+
+    public function apoteks(): HasMany
+    {
+        return $this->hasMany(Apotek::class);
+    }
 }
