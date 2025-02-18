@@ -3,6 +3,8 @@
 namespace App\Livewire;
 
 use App\Models\Apotek;
+use App\Models\Province;
+use App\Models\UnitBisnis;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Blade;
@@ -44,7 +46,7 @@ final class ApotekTable extends PowerGridComponent
 
     public function datasource(): Builder
     {
-        return Apotek::query()->with(['unitBisnis', 'zip', 'karyawans']);
+        return Apotek::query()->with(['unitBisnis', 'zip', 'karyawans', 'province']);
     }
 
     public function relationSearch(): array
@@ -69,6 +71,7 @@ final class ApotekTable extends PowerGridComponent
             })
             ->add('sap_id')
             ->add('name')
+            ->add('province_name')
             ->add('branch_id', fn($apotek) => intval($apotek->branch_id))
             ->add('branch_name', fn($apotek) => e($apotek->unitBisnis->name ?? null))
             ->add('store_type')
@@ -120,7 +123,15 @@ final class ApotekTable extends PowerGridComponent
     public function filters(): array
     {
         return [
-            Filter::datetimepicker('created_at'),
+            Filter::select('branch_name', 'branch_id')
+                ->dataSource(UnitBisnis::all())
+                ->optionValue('id')
+                ->optionLabel('name'),
+            Filter::select('province_name', 'province_name')
+                ->dataSource(Province::all())
+                ->optionValue('id')
+                ->optionLabel('name'),
+            Filter::datepicker('operational_date'),
         ];
     }
 

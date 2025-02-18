@@ -20,6 +20,10 @@ class Apotek extends Model
         return $this->belongsTo(Zip::class);
     }
 
+    public function province()
+    {
+        return $this->hasOneThrough(Province::class, Zip::class, 'id', 'id', 'zip_id', 'province_code');
+    }
     public function karyawans(): HasMany
     {
         return $this->hasMany(Karyawan::class, 'apotek_id');
