@@ -13,11 +13,11 @@
         <form wire:submit="save">
             <div class="grid grid-cols-6 gap-4 sm:grid-cols-4">
                 <!-- Details -->
-                <div class="col-span-6 sm:col-span-4 flex flex-col items-center justify-center text-center">
+                <div class="col-span-full flex flex-col items-center justify-center text-center">
                     <img class="size-32 rounded-full" src="{{ $user->profile_photo_url }}"
                          alt="{{ $user->username }}"/>
                 </div>
-                <div class="pt-6 w-full">
+                <div class="pt-6 w-full col-span-full">
                     {{ $this->form }}
                 </div>
             </div>

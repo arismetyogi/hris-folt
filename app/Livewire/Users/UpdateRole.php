@@ -3,13 +3,12 @@
 namespace App\Livewire\Users;
 
 use App\Models\User;
-use Filament\Forms\Components\Select;
+use Filament\Forms\Components\Radio;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
 use Filament\Forms\Form;
 use Illuminate\View\View;
-use Livewire\Component;
 use LivewireUI\Modal\ModalComponent;
 use Spatie\Permission\Models\Role;
 
@@ -23,12 +22,12 @@ class UpdateRole extends ModalComponent implements HasForms
 
     public static function modalMaxWidth(): string
     {
-        return '2xl';
+        return 'xl';
     }
 
     public function mount(?int $id): void
     {
-        $this->user = $id ? User::find($id) : null;
+        $this->user = $id ? User::with('unitBisnis')->find($id) : null;
 
         if (!$this->user && $id) {
             abort(404, 'User not found');
@@ -44,7 +43,7 @@ class UpdateRole extends ModalComponent implements HasForms
     {
         return [
             'name' => $this->user->name,
-            'branch_id' => $this->user->branch->name ?? null,
+            'branch_id' => $this->user->unitBisnis->name ?? null,
             'role' => $this->user->getRoleNames()->first() ?? null,
         ];
     }
@@ -59,7 +58,7 @@ class UpdateRole extends ModalComponent implements HasForms
                 TextInput::make('branch_id')
                     ->disabled()
                     ->label('Unit Bisnis'),
-                Select::make('role')
+                Radio::make('role')
                     ->options(Role::all()->pluck('name', 'name'))
                     ->label('Role'),
             ])
