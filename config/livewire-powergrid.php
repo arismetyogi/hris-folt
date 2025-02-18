@@ -17,10 +17,10 @@ return [
     'cache_ttl' => null,
 
     'icon_resources' => [
-        'paths' => [
+//        'paths' => [
 //             'o' => '\vendor/wireui\heroicons\src\views\components\outline',
 //             's'   => '\vendor\wireui\heroicons\src\views\components\solid',
-        ],
+//        ],
 
         'allowed' => [
             // 'pencil',
