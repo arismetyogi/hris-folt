@@ -55,17 +55,17 @@
                                             }
                                         }
                                     )"
-                                class="block w-full text-left px-4 py-2 text-sm {{ $config['class'] ?? 'text-gray-700 hover:bg-gray-100/90 hover:text-gray-900' }}"
+                                class="flex items-center w-full text-left px-4 py-2 text-sm gap-2 {{ $config['class'] ?? 'text-gray-700 hover:bg-gray-100/90 hover:text-gray-900' }}"
                                 role="menuitem">
                                 @switch($config['function'])
                                     @case('updateRole')
-                                        <x-phosphor-graduation-cap class="w-5 h-5 inline-block" />
+                                        <x-phosphor-graduation-cap class="size-4 inline-block" />
                                         @break
                                     @case('updatePermissions')
-                                        <x-phosphor-key class="w-5 h-5 inline-block" />
+                                        <x-phosphor-key class="size-4 inline-block" />
                                         @break
                                     @default
-                                        <x-phosphor-pencil class="w-5 h-5 inline-block" />
+                                        <x-phosphor-pencil class="size-4 inline-block" />
                                 @endswitch
                                 {{ $config['label'] }}
                             </button>
@@ -82,11 +82,11 @@
                                             }
                                         }
                                     )"
-                                class="block w-full text-left px-4 py-2 text-sm {{ $config['class'] ?? 'text-gray-700 hover:bg-gray-100/90 hover:text-gray-900' }}"
+                                class="flex items-center w-full text-left px-4 py-2 text-sm gap-2 {{ $config['class'] ?? 'text-gray-700 hover:bg-gray-100/90 hover:text-gray-900' }}"
                                 role="menuitem">
                                 @switch($config['function'])
                                     @case('delete')
-                                        <x-phosphor-x class="w-5 h-5 inline-block" />
+                                        <x-phosphor-x class="size-4 inline-block" />
                                         @break
                                 @endswitch
                                 {{ $config['label'] }}

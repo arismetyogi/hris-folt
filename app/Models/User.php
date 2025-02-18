@@ -77,7 +77,7 @@ class User extends Authenticatable implements MustVerifyEmail
 
     public function avatar(): string
     {
-        return Storage::url($this->profile_photo_path);
+        return $this->profile_photo_url;
     }
 
     public function isAdmin()

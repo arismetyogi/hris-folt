@@ -173,6 +173,10 @@ final class UserTable extends PowerGridComponent
             Rule::rows()
                 ->when(fn($row) => $row->isSuperAdmin())
                 ->hideToggleable(),
+
+            Rule::rows()
+                ->when(fn($row) => $row->isSuperAdmin())
+                ->disableEditOnClick(),
         ];
     }
 
