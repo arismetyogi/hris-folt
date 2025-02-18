@@ -19,6 +19,7 @@ use PowerComponents\LivewirePowerGrid\Facades\Rule;
 use PowerComponents\LivewirePowerGrid\PowerGridComponent;
 use PowerComponents\LivewirePowerGrid\PowerGridFields;
 use PowerComponents\LivewirePowerGrid\Traits\WithExport;
+use Spatie\Permission\Models\Role;
 
 final class UserTable extends PowerGridComponent
 {
@@ -165,7 +166,19 @@ final class UserTable extends PowerGridComponent
     public function filters(): array
     {
         return [
-            Filter::datetimepicker('created_at'),
+            Filter::select('branch_name', 'branch_id')
+                ->dataSource(UnitBisnis::all())
+                ->optionValue('id')
+                ->optionLabel('name'),
+            Filter::select('roles', 'roles.name')
+                ->dataSource(Role::all())
+                ->optionValue('name')
+                ->optionLabel('name')
+                ->builder(function ($builder, $value) {
+                    return $builder->whereHas('roles', function ($query) use ($value) {
+                        $query->where('name', $value);
+                    });
+                })
         ];
     }
 
