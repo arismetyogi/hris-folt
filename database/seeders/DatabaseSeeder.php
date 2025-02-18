@@ -18,25 +18,23 @@ class DatabaseSeeder extends Seeder
     {
         $this->call([
             RolePermissionsSeeder::class,
-//            ProvinceSeeder::class,
-//            ZipSeeder::class,
-//            BankSeeder::class,
-//
-//            BandSeeder::class,
-//            StatusDescSeeder::class,
-//            GradeEselonSeeder::class,
-//            RecruitmentSeeder::class,
-//            EmployeeLevelSeeder::class,
-//            EmployeeStatusSeeder::class,
-//            AreaSeeder::class,
-//            JabatanSeeder::class,
-//            SubjabatanSeeder::class,
-//
-            UnitBisnisSeeder::class,
-//            ApotekSeeder::class,
-        ]);
+            ProvinceSeeder::class,
+            ZipSeeder::class,
+            BankSeeder::class,
 
-        User::factory(10)->state(fn() => ['created_at' => Carbon::now()->subMinute(0, 59)])->create();
+            BandSeeder::class,
+            StatusDescSeeder::class,
+            GradeEselonSeeder::class,
+            RecruitmentSeeder::class,
+            EmployeeLevelSeeder::class,
+            EmployeeStatusSeeder::class,
+            AreaSeeder::class,
+            JabatanSeeder::class,
+            SubjabatanSeeder::class,
+
+            UnitBisnisSeeder::class,
+            ApotekSeeder::class,
+        ]);
 
         User::factory()->create([
             'name' => 'Super Admin',
@@ -46,6 +44,8 @@ class DatabaseSeeder extends Seeder
             'is_active' => true,
         ])->assignRole(Roles::SuperAdmin);
 
+        User::factory(10)->state(fn() => ['created_at' => Carbon::now()->subMinute(0, 59)])->create();
+
         User::factory()->create([
             'name' => 'Admin',
             'username' => 'admin',
@@ -53,6 +53,6 @@ class DatabaseSeeder extends Seeder
             'is_active' => true,
         ])->assignRole(Roles::Admin);
 
-        User::factory(26)->unverified()->create();
+        User::factory(900)->unverified()->create();
     }
 }
