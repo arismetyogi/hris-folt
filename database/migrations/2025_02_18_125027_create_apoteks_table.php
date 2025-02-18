@@ -13,6 +13,16 @@ return new class extends Migration
     {
         Schema::create('apoteks', function (Blueprint $table) {
             $table->id();
+            $table->unsignedBigInteger('branch_id');
+            $table->string('sap_id', 10)->unique();
+            $table->string('name');
+            $table->string('store_type')->nullable();
+            $table->date('operational_date')->nullable();
+            $table->string('address')->nullable();
+            $table->foreignId('zip_id')->nullable();
+            $table->float('latitude')->nullable();
+            $table->float('longitude')->nullable();
+            $table->string('phone')->nullable();
             $table->timestamps();
         });
     }

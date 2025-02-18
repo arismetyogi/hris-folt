@@ -13,6 +13,16 @@ return new class extends Migration
     {
         Schema::create('zips', function (Blueprint $table) {
             $table->id();
+            $table->string('urban');
+            $table->string('subdistrict');
+            $table->string('city');
+
+            $table->string('province_code');
+            $table->foreign('province_code')
+                ->references('code')
+                ->on('provinces');
+
+            $table->string('code');
             $table->timestamps();
         });
     }
