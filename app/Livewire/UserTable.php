@@ -80,7 +80,6 @@ final class UserTable extends PowerGridComponent
         ];
     }
 
-
     public function fields(): PowerGridFields
     {
         $options = $this->branchSelectOptions();
@@ -181,7 +180,6 @@ final class UserTable extends PowerGridComponent
                 })
         ];
     }
-
 
     public function actionRules($row): array
     {
