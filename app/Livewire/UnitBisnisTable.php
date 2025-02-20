@@ -57,7 +57,13 @@ final class UnitBisnisTable extends PowerGridComponent
             ->add('email')
             ->add('entity_code')
             ->add('entity_name')
-            ->add('created_at_formatted', fn (UnitBisnis $model) => Carbon::parse($model->created_at)->format('d/m/Y H:i:s'));
+            ->add('created_at_formatted', fn (UnitBisnis $model) => Carbon::parse($model->created_at)->format('d/m/Y H:i:s'))
+            ->add('action', function (UnitBisnis $model) {
+                return view('livewire.action-dropdown', [
+                    'model' => $model,
+                    'actions' => $this->getActions(),
+                ])->render();
+            });
     }
 
     public function columns(): array
@@ -89,7 +95,9 @@ final class UnitBisnisTable extends PowerGridComponent
             Column::make('Created at', 'created_at_formatted', 'created_at')
                 ->sortable(),
 
-            Column::action('Action')
+            Column::make('Actions', 'action')
+                ->visibleInExport(false)
+                ->contentClasses('text-center'),
         ];
     }
 
@@ -106,26 +114,21 @@ final class UnitBisnisTable extends PowerGridComponent
         $this->js('alert('.$rowId.')');
     }
 
-    public function actions(UnitBisnis $row): array
+    public function getActions(): array
     {
         return [
-            Button::add('edit')
-                ->slot('Edit: '.$row->id)
-                ->id()
-                ->class('pg-btn-white dark:ring-pg-primary-600 dark:border-pg-primary-600 dark:hover:bg-pg-primary-700 dark:ring-offset-pg-primary-800 dark:text-pg-primary-300 dark:bg-pg-primary-700')
-                ->dispatch('edit', ['rowId' => $row->id])
+            'main' => [
+                'edit' => ['type' => 'modal', 'label' => 'Edit', 'component' => 'unitbisnis.create', 'function' => 'edit'],
+            ],
+            'danger' => [
+                'deleteRow' => ['type' => 'action', 'component' => 'action-modal', 'model' => 'UnitBisnis', 'action' => 'delete', 'label' => 'Delete BM', 'class' => 'text-red-700 hover:bg-red-100 hover:text-red-900', 'function' => 'delete'],
+            ],
         ];
     }
 
-    /*
-    public function actionRules($row): array
-    {
-       return [
-            // Hide button edit for ID 1
-            Rule::button('edit')
-                ->when(fn($row) => $row->id === 1)
-                ->hide(),
-        ];
-    }
-    */
+    protected $listeners = [
+        'refreshUnitBisnisTable' => '$refresh', //refresh table from event
+        'record-deleted' => '$refresh',
+        'record-updated' => '$refresh',
+    ];
 }
