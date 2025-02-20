@@ -57,9 +57,9 @@
                     </x-app.sidebar-dropdown>
                     <x-app.sidebar-dropdown text="Master Data" icon="phosphor-stack-duotone" id="data"
                                             :active="(Request::is('data'))"
-                                            :open="(Request::is('branches') || Request::is('apoteks')) ? '1' : '0'">
-                        <x-app.sidebar-link href="{{ route('dashboard') }}" icon="phosphor-building-duotone"
-                                            :active="Request::is('branches')" wire:navigate>
+                                            :open="(Request::is('unitbisnis') || Request::is('apoteks')) ? '1' : '0'">
+                        <x-app.sidebar-link href="{{ route('unitbisnis.index') }}" icon="phosphor-building-duotone"
+                                            :active="Request::is('unitbisnis')" wire:navigate>
                             Unit Bisnis
                         </x-app.sidebar-link>
                         <x-app.sidebar-link href="{{ route('apoteks.index') }}" icon="phosphor-storefront-duotone"
