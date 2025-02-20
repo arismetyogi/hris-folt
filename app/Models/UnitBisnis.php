@@ -29,6 +29,6 @@ class UnitBisnis extends Model
 
     public function apoteks(): HasMany
     {
-        return $this->hasMany(Apotek::class);
+        return $this->hasMany(Apotek::class, 'branch_id', 'id');
     }
 }

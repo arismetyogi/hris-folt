@@ -10,9 +10,9 @@ class Apotek extends Model
 {
     protected $guarded = ['id','created_at','updated_at'];
 
-    public function unitBisnis(): BelongsTo
+    public function branch(): BelongsTo
     {
-        return $this->belongsTo(UnitBisnis::class, 'branch_id');
+        return $this->belongsTo(UnitBisnis::class, 'branch_id', 'id');
     }
 
     public function zip(): BelongsTo

@@ -8,16 +8,21 @@ use App\Models\UnitBisnis;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Blade;
+use Illuminate\Support\Facades\DB;
 use PowerComponents\LivewirePowerGrid\Button;
 use PowerComponents\LivewirePowerGrid\Column;
 use PowerComponents\LivewirePowerGrid\Components\SetUp\Exportable;
 use PowerComponents\LivewirePowerGrid\Facades\Filter;
 use PowerComponents\LivewirePowerGrid\Facades\PowerGrid;
+use PowerComponents\LivewirePowerGrid\Facades\Rule;
 use PowerComponents\LivewirePowerGrid\PowerGridComponent;
 use PowerComponents\LivewirePowerGrid\PowerGridFields;
+use PowerComponents\LivewirePowerGrid\Traits\WithExport;
 
 final class ApotekTable extends PowerGridComponent
 {
+    use WithExport;
+
     public string $tableName = 'apotek-table';
 
     public bool $showFilters = true;
@@ -46,13 +51,13 @@ final class ApotekTable extends PowerGridComponent
 
     public function datasource(): Builder
     {
-        return Apotek::query()->with(['unitBisnis', 'zip', 'karyawans', 'province']);
+        return Apotek::query()->with(['branch', 'zip', 'karyawans', 'province']);
     }
 
     public function relationSearch(): array
     {
         return [
-            'unitBisnis' => [
+            'branch' => [
                 'name',
                 'code'
             ]
@@ -73,7 +78,7 @@ final class ApotekTable extends PowerGridComponent
             ->add('name')
             ->add('province_name')
             ->add('branch_id', fn($apotek) => intval($apotek->branch_id))
-            ->add('branch_name', fn($apotek) => e($apotek->unitBisnis->name ?? null))
+            ->add('branch_name', fn($apotek) => e($apotek->branch->name ?? null))
             ->add('store_type')
             ->add('operational_date', fn(Apotek $model) => Carbon::createFromDate($model->operational_date)->format('d/m/Y'))
             ->add('address', function ($apotek) {
@@ -94,7 +99,13 @@ final class ApotekTable extends PowerGridComponent
             ->add('longitude')
             ->add('phone')
             ->add('zip', fn($apotek) => e($apotek->zip->code ?? null))
-            ->add('created_at_formatted', fn(Apotek $model) => Carbon::parse($model->created_at)->format('d/m/Y H:i:s'));
+            ->add('created_at_formatted', fn(Apotek $model) => Carbon::parse($model->created_at)->format('d/m/Y H:i:s'))
+            ->add('action', function (Apotek $model) {
+                return view('livewire.action-dropdown', [
+                    'model' => $model,
+                    'actions' => $this->getActions(),
+                ])->render();
+            });
     }
 
     public function columns(): array
@@ -116,7 +127,9 @@ final class ApotekTable extends PowerGridComponent
             Column::make('Created at', 'created_at_formatted', 'created_at')
                 ->sortable(),
 
-            Column::action('Action')
+            Column::make('Actions', 'action')
+                ->visibleInExport(false)
+                ->contentClasses('text-center'),
         ];
     }
 
@@ -125,6 +138,16 @@ final class ApotekTable extends PowerGridComponent
         return [
             Filter::select('branch_name', 'branch_id')
                 ->dataSource(UnitBisnis::all())
+                ->optionValue('id')
+                ->optionLabel('name'),
+            Filter::select('store_type', 'store_type')
+                ->dataSource(DB::table('apoteks')
+                    ->select('store_type')
+                    ->distinct()
+                    ->get()
+                    ->map(fn($item) => ['id' => $item->store_type, 'name' => $item->store_type])
+                    ->toArray()
+                )
                 ->optionValue('id')
                 ->optionLabel('name'),
             Filter::select('province_name', 'province_name')
@@ -141,26 +164,28 @@ final class ApotekTable extends PowerGridComponent
         $this->js('alert(' . $rowId . ')');
     }
 
-    public function actions(Apotek $row): array
+    public function actionRules($row): array
     {
         return [
-            Button::add('edit')
-                ->slot('Edit: ' . $row->id)
-                ->id()
-                ->class('pg-btn-white dark:ring-pg-primary-600 dark:border-pg-primary-600 dark:hover:bg-pg-primary-700 dark:ring-offset-pg-primary-800 dark:text-pg-primary-300 dark:bg-pg-primary-700')
-                ->dispatch('edit', ['rowId' => $row->id])
+            //
         ];
     }
 
-    /*
-    public function actionRules($row): array
+    public function getActions(): array
     {
-       return [
-            // Hide button edit for ID 1
-            Rule::button('edit')
-                ->when(fn($row) => $row->id === 1)
-                ->hide(),
+        return [
+            'main' => [
+                'edit' => ['type' => 'modal', 'label' => 'Edit', 'component' => 'apoteks.create', 'function' => 'edit'],
+            ],
+            'danger' => [
+                'deleteRow' => ['type' => 'action', 'component' => 'action-modal', 'model' => 'Apotek', 'action' => 'delete', 'label' => 'Delete Apotek', 'class' => 'text-red-700 hover:bg-red-100 hover:text-red-900', 'function' => 'delete'],
+            ],
         ];
     }
-    */
+
+    protected $listeners = [
+        'refreshApotekTable' => '$refresh', //refresh table from event
+        'record-deleted' => '$refresh',
+        'record-updated' => '$refresh',
+    ];
 }
