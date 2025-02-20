@@ -88,7 +88,7 @@ final class ApotekTable extends PowerGridComponent
                 $target = ($href !== '#') ? ' target="_blank"' : '';
                 $address = ($apotek->address != "-") ? $apotek->address : ($apotek->latitude . ',' . $apotek->longitude);
 
-                return '<a class="flex items-center gap-2" href="' . $href . '"' . $target . ' rel="noopener noreferrer">
+                return '<a class="flex items-center gap-2 w-48 lg:w-64" href="' . $href . '"' . $target . ' rel="noopener noreferrer">
                     <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-green-500 flex-shrink-0" viewBox="0 0 24 24" fill="currentColor">
                         <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
                     </svg>
