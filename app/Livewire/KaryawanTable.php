@@ -2,25 +2,42 @@
 
 namespace App\Livewire;
 
+use App\Models\Apotek;
 use App\Models\Karyawan;
+use App\Models\UnitBisnis;
 use Illuminate\Support\Carbon;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Facades\DB;
 use PowerComponents\LivewirePowerGrid\Button;
 use PowerComponents\LivewirePowerGrid\Column;
+use PowerComponents\LivewirePowerGrid\Components\SetUp\Exportable;
 use PowerComponents\LivewirePowerGrid\Facades\Filter;
 use PowerComponents\LivewirePowerGrid\Facades\PowerGrid;
 use PowerComponents\LivewirePowerGrid\PowerGridFields;
 use PowerComponents\LivewirePowerGrid\PowerGridComponent;
+use PowerComponents\LivewirePowerGrid\Traits\WithExport;
 
 final class KaryawanTable extends PowerGridComponent
 {
-    public string $tableName = 'karyawan-table-zuuajy-table';
+    use WithExport;
+
+    public string $tableName = 'karyawans-table';
+
+    public function boot(): void
+    {
+        config(['livewire-powergrid.filter' => 'outside']);
+    }
 
     public function setUp(): array
     {
         $this->showCheckBox();
 
         return [
+            PowerGrid::exportable('master_apotek')
+                ->columnWidth([
+                    2 => 30,
+                ])
+                ->type(Exportable::TYPE_XLS, Exportable::TYPE_CSV),
             PowerGrid::header()
                 ->showSearchInput(),
             PowerGrid::footer()
@@ -31,44 +48,62 @@ final class KaryawanTable extends PowerGridComponent
 
     public function datasource(): Builder
     {
-        return Karyawan::query();
+        return Karyawan::query()->with(['branch', 'apotek', 'zip', 'band', 'bank', 'employeeStatus', 'jabatan', 'subjabatan', 'gradeEselon', 'area', 'employeeLevel', 'recruitment']);
     }
 
     public function relationSearch(): array
     {
-        return [];
+        return [
+            'branch' => [
+                'name',
+                'code'
+            ],
+            'apotek' => [
+                'name',
+                'code'
+            ],
+            'gradeEselon' => [
+                'grade','eselon'
+            ],
+            'jabatan' => [
+                'name',
+            ],
+            'subjabatan' => [
+                'name',
+            ]
+        ];
     }
 
     public function fields(): PowerGridFields
     {
         return PowerGrid::fields()
             ->add('id')
-            ->add('branch_id')
-            ->add('apotek_id')
+            ->add('branch_id', fn(Karyawan $model) => $model->branch->name ?? '')
+            ->add('apotek_id', fn(Karyawan $model) => $model->apotek->name ?? '')
             ->add('sap_id')
             ->add('npp')
             ->add('nik')
             ->add('name')
-            ->add('date_of_birth_formatted', fn (Karyawan $model) => Carbon::parse($model->date_of_birth)->format('d/m/Y'))
+            ->add('date_of_birth_formatted', fn(Karyawan $model) => Carbon::parse($model->date_of_birth)->format('d/m/Y'))
             ->add('sex')
             ->add('address')
             ->add('phone')
             ->add('religion')
             ->add('blood_type')
-            ->add('zip_id')
-            ->add('employee_status_id')
-            ->add('jabatan_id')
-            ->add('subjabatan_id')
-            ->add('band_id')
-            ->add('grade_eselon_id')
-            ->add('area_id')
-            ->add('employee_level_id')
+            ->add('zip_id', fn(Karyawan $model) => $model->zip->code ?? '')
+            ->add('employee_status_id', fn(Karyawan $model) => $model->employeeStatus->name ?? '')
+            ->add('jabatan_id', fn(Karyawan $model) => $model->jabatan->name ?? '')
+            ->add('subjabatan_id', fn(Karyawan $model) => $model->subjabatan->name ?? '')
+            ->add('band_id', fn(Karyawan $model) => $model->band->name ?? '')
+            ->add('grade_eselon_id', fn(Karyawan $model) => $model->gradeEselon->name ?? '')
+            ->add('area_id', fn(Karyawan $model) => $model->area->name ?? '')
+            ->add('employee_level_id', fn(Karyawan $model) => $model->employeeLevel->name ?? '')
             ->add('saptitle_id')
             ->add('saptitle_name')
-            ->add('date_hired_formatted', fn (Karyawan $model) => Carbon::parse($model->date_hired)->format('d/m/Y'))
-            ->add('date_promoted_formatted', fn (Karyawan $model) => Carbon::parse($model->date_promoted)->format('d/m/Y'))
-            ->add('date_last_mutated_formatted', fn (Karyawan $model) => Carbon::parse($model->date_last_mutated)->format('d/m/Y'))
-            ->add('status_desc_id')
+            ->add('date_hired_formatted', fn(Karyawan $model) => Carbon::parse($model->date_hired)->format('d/m/Y'))
+            ->add('date_promoted_formatted', fn(Karyawan $model) => Carbon::parse($model->date_promoted)->format('d/m/Y'))
+            ->add('date_last_mutated_formatted', fn(Karyawan $model) => Carbon::parse($model->date_last_mutated)->format('d/m/Y'))
+            ->add('status_desc_id', fn(Karyawan $model) => $model->statusDesc->name ?? '')
             ->add('bpjs_id')
             ->add('bpjstk_id')
             ->add('insured_member_count')
@@ -76,155 +111,222 @@ final class KaryawanTable extends PowerGridComponent
             ->add('contract_document_id')
             ->add('contract_sequence_no')
             ->add('contract_term')
-            ->add('contract_start_formatted', fn (Karyawan $model) => Carbon::parse($model->contract_start)->format('d/m/Y'))
-            ->add('contract_end_formatted', fn (Karyawan $model) => Carbon::parse($model->contract_end)->format('d/m/Y'))
+            ->add('contract_start_formatted', fn(Karyawan $model) => Carbon::parse($model->contract_start)->format('d/m/Y'))
+            ->add('contract_end_formatted', fn(Karyawan $model) => Carbon::parse($model->contract_end)->format('d/m/Y'))
             ->add('npwp')
             ->add('status_pasangan')
             ->add('jumlah_tanggungan')
             ->add('pasangan_ditanggung_pajak')
             ->add('account_no')
             ->add('account_name')
-            ->add('bank_id')
-            ->add('recruitment_id')
+            ->add('bank_id', fn(Karyawan $model) => $model->bank->name ?? '')
+            ->add('recruitment_id', fn(Karyawan $model) => $model->recruitment->name ?? '')
             ->add('pants_size')
             ->add('shirt_size')
-            ->add('created_at_formatted', fn (Karyawan $model) => Carbon::parse($model->created_at)->format('d/m/Y H:i:s'));
+            ->add('created_at_formatted', fn(Karyawan $model) => Carbon::parse($model->created_at)->format('d/m/Y H:i:s'))
+            ->add('action', function (Karyawan $model) {
+                return view('livewire.action-dropdown', [
+                    'model' => $model,
+                    'actions' => $this->getActions(),
+                ])->render();
+            });
     }
 
     public function columns(): array
     {
         return [
-            Column::make('Id', 'id'),
-            Column::make('Branch id', 'branch_id'),
-            Column::make('Apotek id', 'apotek_id'),
-            Column::make('Sap id', 'sap_id')
+            Column::make('#', 'id'),
+            Column::make('Unit Bisnis', 'branch_id'),
+            Column::make('Apotek', 'apotek_id'),
+            Column::make('ID SAP', 'sap_id')
                 ->sortable()
                 ->searchable(),
 
-            Column::make('Npp', 'npp')
+            Column::make('NPP', 'npp')
                 ->sortable()
                 ->searchable(),
 
-            Column::make('Nik', 'nik')
+            Column::make('NIK', 'nik')
+                ->hidden()
+                ->visibleInExport(true)
                 ->sortable()
                 ->searchable(),
 
-            Column::make('Name', 'name')
+            Column::make('Nama', 'name')
                 ->sortable()
                 ->searchable(),
 
             Column::make('Date of birth', 'date_of_birth_formatted', 'date_of_birth')
                 ->sortable(),
 
-            Column::make('Sex', 'sex')
+            Column::make('Gender', 'sex')
                 ->sortable()
                 ->searchable(),
 
             Column::make('Address', 'address')
+                ->hidden()
+                ->visibleInExport(true)
                 ->sortable()
                 ->searchable(),
 
             Column::make('Phone', 'phone')
+                ->hidden()
+                ->visibleInExport(true)
                 ->sortable()
                 ->searchable(),
 
             Column::make('Religion', 'religion')
+                ->hidden()
+                ->visibleInExport(true)
                 ->sortable()
                 ->searchable(),
 
             Column::make('Blood type', 'blood_type')
+                ->hidden()
+                ->visibleInExport(true)
                 ->sortable()
                 ->searchable(),
 
-            Column::make('Zip id', 'zip_id'),
-            Column::make('Employee status id', 'employee_status_id'),
-            Column::make('Jabatan id', 'jabatan_id'),
-            Column::make('Subjabatan id', 'subjabatan_id'),
-            Column::make('Band id', 'band_id'),
-            Column::make('Grade eselon id', 'grade_eselon_id'),
-            Column::make('Area id', 'area_id'),
-            Column::make('Employee level id', 'employee_level_id'),
-            Column::make('Saptitle id', 'saptitle_id')
+            Column::make('Kode Pos', 'zip_id')
+                ->hidden()
+                ->visibleInExport(true),
+            Column::make('Status Pegawai', 'employee_status_id')
+                ->hidden()
+                ->visibleInExport(true),
+            Column::make('Jabatan', 'jabatan_id'),
+            Column::make('Subjabatan', 'subjabatan_id'),
+            Column::make('Band', 'band_id')
+                ->hidden()
+                ->visibleInExport(true),
+            Column::make('Grade Eselon', 'grade_eselon_id')
+                ->hidden()
+                ->visibleInExport(true),
+            Column::make('Area', 'area_id')
+                ->hidden()
+                ->visibleInExport(true),
+            Column::make('Level Pegawai', 'employee_level_id')
+                ->hidden()
+                ->visibleInExport(true),
+            Column::make('ID Jab SAP', 'saptitle_id')
+                ->hidden()
+                ->visibleInExport(true)
                 ->sortable()
                 ->searchable(),
 
-            Column::make('Saptitle name', 'saptitle_name')
+            Column::make('Nama Jab SAP', 'saptitle_name')
                 ->sortable()
                 ->searchable(),
 
-            Column::make('Date hired', 'date_hired_formatted', 'date_hired')
+            Column::make('Tanggal Diterima', 'date_hired_formatted', 'date_hired')
+                ->hidden()
+                ->visibleInExport(true)
                 ->sortable(),
 
-            Column::make('Date promoted', 'date_promoted_formatted', 'date_promoted')
+            Column::make('Tanggal Diangkat', 'date_promoted_formatted', 'date_promoted')
+                ->hidden()
+                ->visibleInExport(true)
                 ->sortable(),
 
-            Column::make('Date last mutated', 'date_last_mutated_formatted', 'date_last_mutated')
+            Column::make('Tgl Mutasi Terakhir', 'date_last_mutated_formatted', 'date_last_mutated')
                 ->sortable(),
 
-            Column::make('Status desc id', 'status_desc_id'),
-            Column::make('Bpjs id', 'bpjs_id')
+            Column::make('Deskripsi Status', 'status_desc_id')
+                ->hidden()
+                ->visibleInExport(true),
+            Column::make('ID BPJS', 'bpjs_id')
                 ->sortable()
                 ->searchable(),
 
-            Column::make('Bpjstk id', 'bpjstk_id')
+            Column::make('ID BPJSTK', 'bpjstk_id')
                 ->sortable()
                 ->searchable(),
 
-            Column::make('Insured member count', 'insured_member_count'),
-            Column::make('Bpjs class', 'bpjs_class'),
-            Column::make('Contract document id', 'contract_document_id')
+            Column::make('Jumlah Tanggungan', 'insured_member_count')
+                ->hidden()
+                ->visibleInExport(true),
+            Column::make('Kelas BPJS', 'bpjs_class')
+                ->hidden()
+                ->visibleInExport(true),
+            Column::make('No Kontrak', 'contract_document_id')
+                ->hidden()
+                ->visibleInExport(true)
                 ->sortable()
                 ->searchable(),
 
-            Column::make('Contract sequence no', 'contract_sequence_no'),
-            Column::make('Contract term', 'contract_term'),
-            Column::make('Contract start', 'contract_start_formatted', 'contract_start')
+            Column::make('Kontrak ke-', 'contract_sequence_no')
+                ->hidden()
+                ->visibleInExport(true),
+            Column::make('Masa Kontrak', 'contract_term')
+                ->hidden()
+                ->visibleInExport(true),
+            Column::make('Awal Kontrak', 'contract_start_formatted', 'contract_start')
+                ->hidden()
+                ->visibleInExport(true)
                 ->sortable(),
 
-            Column::make('Contract end', 'contract_end_formatted', 'contract_end')
+            Column::make('Berakhir Kontrak', 'contract_end_formatted', 'contract_end')
                 ->sortable(),
 
-            Column::make('Npwp', 'npwp')
+            Column::make('NPWP', 'npwp')
                 ->sortable()
                 ->searchable(),
 
-            Column::make('Status pasangan', 'status_pasangan')
+            Column::make('Status Pasangan', 'status_pasangan')
                 ->sortable()
                 ->searchable(),
 
-            Column::make('Jumlah tanggungan', 'jumlah_tanggungan'),
-            Column::make('Pasangan ditanggung pajak', 'pasangan_ditanggung_pajak')
+            Column::make('Jumlah Tanggungan Pajak', 'jumlah_tanggungan'),
+            Column::make('Pasangan Ditanggung Pajak', 'pasangan_ditanggung_pajak')
+                ->hidden()
+                ->visibleInExport(true)
                 ->sortable()
                 ->searchable(),
 
-            Column::make('Account no', 'account_no')
+            Column::make('No Rekening', 'account_no')
+                ->hidden()
+                ->visibleInExport(true)
                 ->sortable()
                 ->searchable(),
 
-            Column::make('Account name', 'account_name')
+            Column::make('Nama Rekening', 'account_name')
+                ->hidden()
+                ->visibleInExport(true)
                 ->sortable()
                 ->searchable(),
 
-            Column::make('Bank id', 'bank_id'),
-            Column::make('Recruitment id', 'recruitment_id'),
-            Column::make('Pants size', 'pants_size')
+            Column::make('Bank', 'bank_id')
+                ->hidden()
+                ->visibleInExport(true),
+            Column::make('Rekrutmen', 'recruitment_id')
+                ->hidden()
+                ->visibleInExport(true),
+            Column::make('Ukuran Celana/Rok', 'pants_size')
                 ->sortable()
                 ->searchable(),
 
-            Column::make('Shirt size', 'shirt_size')
+            Column::make('Ukuran Baju', 'shirt_size')
                 ->sortable()
                 ->searchable(),
 
             Column::make('Created at', 'created_at_formatted', 'created_at')
                 ->sortable(),
-
-            Column::action('Action')
+            Column::make('Actions', 'action')
+                ->visibleInExport(false)
+                ->contentClasses('text-center'),
         ];
     }
 
     public function filters(): array
     {
         return [
+            Filter::select('branch_name', 'branch_id')
+                ->dataSource(UnitBisnis::all())
+                ->optionValue('id')
+                ->optionLabel('name'),
+            Filter::select('apotek_name', 'apotek_id')
+                ->dataSource(Apotek::all())
+                ->optionValue('id')
+                ->optionLabel('name'),
             Filter::datepicker('date_hired'),
             Filter::datepicker('date_promoted'),
             Filter::datepicker('date_last_mutated'),
@@ -236,29 +338,24 @@ final class KaryawanTable extends PowerGridComponent
     #[\Livewire\Attributes\On('edit')]
     public function edit($rowId): void
     {
-        $this->js('alert('.$rowId.')');
+        $this->js('alert(' . $rowId . ')');
     }
 
-    public function actions(Karyawan $row): array
+    public function getActions(): array
     {
         return [
-            Button::add('edit')
-                ->slot('Edit: '.$row->id)
-                ->id()
-                ->class('pg-btn-white dark:ring-pg-primary-600 dark:border-pg-primary-600 dark:hover:bg-pg-primary-700 dark:ring-offset-pg-primary-800 dark:text-pg-primary-300 dark:bg-pg-primary-700')
-                ->dispatch('edit', ['rowId' => $row->id])
+            'main' => [
+                'edit' => ['type' => 'modal', 'label' => 'Edit', 'component' => 'karyawans.create', 'function' => 'edit'],
+            ],
+            'danger' => [
+                'deleteRow' => ['type' => 'action', 'component' => 'action-modal', 'model' => 'Karyawan', 'action' => 'delete', 'label' => 'Delete Karyawan', 'class' => 'text-red-700 hover:bg-red-100 hover:text-red-900', 'function' => 'delete'],
+            ],
         ];
     }
 
-    /*
-    public function actionRules($row): array
-    {
-       return [
-            // Hide button edit for ID 1
-            Rule::button('edit')
-                ->when(fn($row) => $row->id === 1)
-                ->hide(),
-        ];
-    }
-    */
+    protected $listeners = [
+        'refreshKaryawanTable' => '$refresh', //refresh table from event
+        'record-deleted' => '$refresh',
+        'record-updated' => '$refresh',
+    ];
 }

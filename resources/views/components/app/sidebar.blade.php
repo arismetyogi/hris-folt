@@ -46,12 +46,12 @@
                     <x-app.sidebar-dropdown text="Karyawan" icon="phosphor-users-four-duotone" id="karyawan"
                                             :active="(Request::is('karyawans'))"
                                             :open="(Request::is('karyawans') || Request::is('payrolls')) ? '1' : '0'">
-                        <x-app.sidebar-link href="{{ route('dashboard') }}" icon="phosphor-users-four-duotone"
+                        <x-app.sidebar-link href="{{ route('karyawans.index') }}" icon="phosphor-users-four-duotone"
                                             :active="Request::is('karyawans')" wire:navigate>
                             Karyawan
                         </x-app.sidebar-link>
-                        <x-app.sidebar-link href="{{ route('dashboard') }}" icon="phosphor-users-four-duotone"
-                                            :active="Request::is('karyawans')" wire:navigate>
+                        <x-app.sidebar-link href="{{ route('dashboard') }}" icon="phosphor-cash-register-duotone"
+                                            :active="Request::is('payrolls')" wire:navigate>
                             Payrolls
                         </x-app.sidebar-link>
                     </x-app.sidebar-dropdown>
