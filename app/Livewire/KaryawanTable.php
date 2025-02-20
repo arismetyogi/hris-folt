@@ -39,6 +39,7 @@ final class KaryawanTable extends PowerGridComponent
                 ])
                 ->type(Exportable::TYPE_XLS, Exportable::TYPE_CSV),
             PowerGrid::header()
+                ->includeViewOnBottom()
                 ->showSearchInput(),
             PowerGrid::footer()
                 ->showPerPage()
@@ -135,7 +136,10 @@ final class KaryawanTable extends PowerGridComponent
     public function columns(): array
     {
         return [
-            Column::make('#', 'id'),
+            Column::make('Actions', 'action')
+                ->visibleInExport(false)
+                ->contentClasses('text-center'),
+
             Column::make('Unit Bisnis', 'branch_id'),
             Column::make('Apotek', 'apotek_id'),
             Column::make('ID SAP', 'sap_id')
@@ -310,9 +314,6 @@ final class KaryawanTable extends PowerGridComponent
 
             Column::make('Created at', 'created_at_formatted', 'created_at')
                 ->sortable(),
-            Column::make('Actions', 'action')
-                ->visibleInExport(false)
-                ->contentClasses('text-center'),
         ];
     }
 
