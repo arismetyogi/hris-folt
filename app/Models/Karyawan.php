@@ -9,17 +9,17 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 class Karyawan extends Model
 {
     protected $fillable = [
-        'branch_id', 'apotek_id', 'sap_id', 'npp', 'nik', 'name', 'date_of_birth', 'sex', 'address', 'phone', 'religion', 'blood_type', 'zip_id', 'employee_status_id', 'jabatan_id', 'subjabatan_id', 'band_id', 'grade_eselon_id', 'area_id', 'employee_level_id', 'saptitle_id', 'saptitle_name', 'date_hired', 'date_promoted', 'date_last_mutated', 'status_desc_id', 'bpjs_id', 'bpjstk_id', 'insured_member_count', 'bpjs_class', 'contract_document_id', 'contract_sequence_no', 'contract_term', 'contract_start', 'contract_end', 'npwp', 'status_pasangan', 'jumlah_tanggungan', 'pasangan_ditanggung_pajak', 'account_no', 'account_name', 'bank_id', 'recruitment_id', 'pants_size', 'shirt_size'
+    'branch_id', 'apotek_id', 'sap_id', 'npp', 'nik', 'name', 'date_of_birth', 'sex', 'address', 'phone', 'religion', 'blood_type', 'zip_id', 'employee_status_id', 'jabatan_id', 'subjabatan_id', 'band_id', 'grade_eselon_id', 'area_id', 'employee_level_id', 'saptitle_id', 'saptitle_name', 'date_hired', 'date_promoted', 'date_last_mutated', 'status_desc_id', 'bpjs_id', 'bpjstk_id', 'insured_member_count', 'bpjs_class', 'contract_document_id', 'contract_sequence_no', 'contract_term', 'contract_start', 'contract_end', 'npwp', 'status_pasangan', 'jumlah_tanggungan', 'pasangan_ditanggung_pajak', 'account_no', 'account_name', 'bank_id', 'recruitment_id', 'pants_size', 'shirt_size'
     ];
+
+    public function branch(): BelongsTo
+    {
+        return $this->belongsTo(UnitBisnis::class, 'branch_id');
+    }
 
     public function apotek(): BelongsTo
     {
         return $this->belongsTo(Apotek::class);
-    }
-
-    public function branch(): BelongsTo
-    {
-        return $this->belongsTo(UnitBisnis::class);
     }
 
     public function payrolls(): HasMany
@@ -44,17 +44,17 @@ class Karyawan extends Model
 
     public function empLevel(): BelongsTo
     {
-        return $this->belongsTo(EmployeeLevel::class);
+        return $this->belongsTo(EmployeeLevel::class, 'employee_level_id');
     }
 
     public function empStatus(): BelongsTo
     {
-        return $this->belongsTo(EmployeeStatus::class);
+        return $this->belongsTo(EmployeeStatus::class, 'employee_status_id');
     }
 
     public function gradeEselon(): BelongsTo
     {
-        return $this->belongsTo(GradeEselon::class);
+        return $this->belongsTo(GradeEselon::class, 'grade_eselon_id');
     }
 
     public function jabatan(): BelongsTo
@@ -64,7 +64,7 @@ class Karyawan extends Model
 
     public function subjabatan(): BelongsTo
     {
-        return $this->belongsTo(Subjabatan::class);
+        return $this->belongsTo(Subjabatan::class, 'subjabatan_id');
     }
 
     public function recruitment(): BelongsTo
@@ -72,8 +72,13 @@ class Karyawan extends Model
         return $this->belongsTo(Recruitment::class);
     }
 
-    public function zip(): BelongsTo
+    public function zip(): BelongsToa
     {
-        return $this->belongsTo(Zip::class);
+        return $this->belongsTo(Zip::class, 'zip_id');
+    }
+
+    public function statusDesc(): BelongsTo
+    {
+        return $this->belongsTo(StatusDesc::class, 'status_desc_id');
     }
 }

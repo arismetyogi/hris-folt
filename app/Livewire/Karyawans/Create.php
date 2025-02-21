@@ -3,14 +3,16 @@
 namespace App\Livewire\Karyawans;
 
 use App\Models\Apotek;
+use App\Models\Area;
 use App\Models\Band;
 use App\Models\Bank;
+use App\Models\EmployeeLevel;
 use App\Models\EmployeeStatus;
 use App\Models\Jabatan;
 use App\Models\Karyawan;
+use App\Models\StatusDesc;
 use App\Models\Subjabatan;
 use App\Models\UnitBisnis;
-use App\Models\Zip;
 use Filament\Forms\Components\Actions\Action;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Select;
@@ -22,6 +24,8 @@ use Filament\Forms\Contracts\HasForms;
 use Filament\Forms\Form;
 use Filament\Forms\Get;
 use Filament\Forms\Set;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\View\View;
 use LivewireUI\Modal\ModalComponent;
 
@@ -40,7 +44,7 @@ class Create extends ModalComponent implements HasForms
 
     public function mount(?int $id = null): void
     {
-        $this->karyawan = $id ? Karyawan::with(['branch', 'apotek'])->find($id) : null;
+        $this->karyawan = $id ? Karyawan::with(['branch', 'apotek', 'area', 'band', 'bank', 'empLevel', 'empStatus', 'gradeEselon', 'jabatan', 'subjabatan', 'recruitment', 'zip', 'statusDesc'])->find($id) : null;
 
         if (!$this->karyawan && $id) {
             abort(404, 'Karyawan not found');
@@ -56,7 +60,45 @@ class Create extends ModalComponent implements HasForms
             'branch_id' => $this->karyawan?->branch_id ?? null,
             'name' => $this->karyawan?->name ?? null,
             'nik' => $this->karyawan?->nik ?? null,
+            'date_of_birth' => $this->karyawan?->date_of_birth ?? null,
+            'sex' => $this->karyawan?->sex ?? null,
+            'addres' => $this->karyawan?->addres ?? null,
+            'phone' => $this->karyawan?->phone ?? null,
+            'religion' => $this->karyawan?->religion ?? null,
+            'blood_type' => $this->karyawan?->blood_type ?? null,
+            'zip_id' => $this->karyawan?->zip_id ?? null,
+            'enployee_status_id' => $this->karyawan?->enployee_status_id ?? null,
+            'jabatan_id' => $this->karyawan?->jabatan_id ?? null,
+            'subjabatan_id' => $this->karyawan?->subjabatan_id ?? null,
+            'band_id' => $this->karyawan?->band_id ?? null,
+            'grade_eselon_id' => $this->karyawan?->grade_eselon_id ?? null,
+            'area_id' => $this->karyawan?->area_id ?? null,
+            'employee_level_id' => $this->karyawan?->employee_level_id ?? null,
+            'saptitle_id' => $this->karyawan?->saptitle_id ?? null,
+            'saptitle_name' => $this->karyawan?->saptitle_name ?? null,
+            'date_hired' => $this->karyawan?->date_hired ?? null,
+            'date_promoted' => $this->karyawan?->date_promoted ?? null,
+            'date_last_mutated' => $this->karyawan?->date_last_mutated ?? null,
+            'status_desc_id' => $this->karyawan?->status_desc_id ?? null,
+            'bpjs_id' => $this->karyawan?->bpjs_id ?? null,
+            'bpjstk_id' => $this->karyawan?->bpjstk_id ?? null,
+            'insured_member_count' => $this->karyawan?->insured_member_count ?? null,
+            'bpjs_class' => $this->karyawan?->bpjs_class ?? null,
+            'contract_document_id' => $this->karyawan?->contract_document_id ?? null,
+            'contract_sequence_no' => $this->karyawan?->contract_sequence_no ?? null,
+            'contract_term' => $this->karyawan?->contract_term ?? null,
+            'contract_start' => $this->karyawan?->contract_start ?? null,
+            'contract_end' => $this->karyawan?->contract_end ?? null,
             'npwp' => $this->karyawan?->npwp ?? null,
+            'status_pasangan' => $this->karyawan?->status_pasangan ?? null,
+            'jumlah_tanggungan' => $this->karyawan?->jumlah_tanggungan ?? null,
+            'pasangan_ditanggung_pajak' => $this->karyawan?->pasangan_ditanggung_pajak ?? null,
+            'account_no' => $this->karyawan?->account_no ?? null,
+            'account_name' => $this->karyawan?->account_name ?? null,
+            'bank_id' => $this->karyawan?->bank_id ?? null,
+            'recruitment_id' => $this->karyawan?->recruitment_id ?? null,
+            'pants_size' => $this->karyawan?->pants_size ?? null,
+            'shirt_size' => $this->karyawan?->shirt_size ?? null,
         ];
     }
 
@@ -144,18 +186,18 @@ class Create extends ModalComponent implements HasForms
                                 ->columnSpan(2),
                             Select::make('zip_id')
                                 ->label('Kode Pos')
-                                ->getSearchResultsUsing(function (string $search) {
-                                    return Zip::query()
-                                        ->whereAny(['code', 'urban', 'subdistrict'], 'like', "%{$search}%")
-                                        ->limit(10) // Limit the number of results to avoid performance issues
-                                        ->get()
-                                        ->mapWithKeys(function ($zip) {
-                                            return [
-                                                $zip->id => "{$zip->code} - {$zip->urban}, {$zip->subdistrict}"
-                                            ];
-                                        });
-                                })
-                                ->searchable(),
+                                ->placeholder('Pilih Kode Pos')
+                                ->relationship(
+                                    'zip',
+                                    'code',
+//                                    modifyQueryUsing: fn(Builder $query) => $query
+//                                        ->orderBy('code')
+//                                        ->orderBy('city')
+                                )
+                                ->live()
+                                ->reactive()
+                                ->getOptionLabelFromRecordUsing(fn ($record) => dd($record))
+                                ->searchable(['code', 'city', 'subdistrict']),
                         ]),
 
                     Step::make('Professional Info')
@@ -224,6 +266,7 @@ class Create extends ModalComponent implements HasForms
                                 ->required(),
                             Select::make('jabatan_id')
                                 ->options(Jabatan::all()->pluck('name', 'id'))
+//                                ->relationship('jabatan', 'name')
                                 ->label('Position')
                                 ->required(),
                             Select::make('subjabatan_id')
@@ -236,18 +279,17 @@ class Create extends ModalComponent implements HasForms
                                 ->required(),
                             Select::make('gradeeselon_id')
                                 ->label('Grade Eselon')
-                                ->relationship('gradeeselon', 'id')
                                 ->getOptionLabelFromRecordUsing(
                                     fn($record) => "{$record->grade} - {$record->eselon}")
                                 ->preload()
                                 ->required(),
                             Select::make('area_id')
+                                ->options(Area::all()->pluck('name', 'id'))
                                 ->label('Area')
-                                ->relationship('area', 'name')
                                 ->required(),
                             Select::make('emplevel_id')
+                                ->options(EmployeeLevel::all()->pluck('name', 'id'))
                                 ->label('Level Pegawai')
-                                ->relationship('emplevel', 'name')
                                 ->required(),
                             TextInput::make('saptitle_id')
                                 ->label('Kode Jab SAP')
@@ -270,16 +312,10 @@ class Create extends ModalComponent implements HasForms
                             DatePicker::make('date_last_mutated')
                                 ->label('Tanggal Mutasi Terakhir')
                                 ->required(),
-                            Select::make('descstatus_id')
+                            Select::make('status_desc_id')
+                                ->options(StatusDesc::all()->pluck('name', 'id'))
                                 ->label('Deskripsi Status')
-                                ->relationship('descstatus', 'name')
                                 ->required(),
-                        ]),
-
-                    Step::make('Contract Details')
-                        ->columns(2)
-                        ->schema([
-
                         ]),
 
                     Step::make('Contract Details')

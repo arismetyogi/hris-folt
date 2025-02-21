@@ -49,7 +49,7 @@ final class KaryawanTable extends PowerGridComponent
 
     public function datasource(): Builder
     {
-        return Karyawan::query()->with(['branch', 'apotek', 'zip', 'band', 'bank', 'empStatus', 'jabatan', 'subjabatan', 'gradeEselon', 'area', 'empLevel', 'recruitment']);
+        return Karyawan::query()->with(['branch', 'apotek', 'area', 'band', 'bank', 'empLevel', 'empStatus', 'gradeEselon', 'jabatan', 'subjabatan', 'statusDesc', 'recruitment', 'zip']);
     }
 
     public function relationSearch(): array
@@ -64,12 +64,12 @@ final class KaryawanTable extends PowerGridComponent
                 'code'
             ],
             'gradeEselon' => [
-                'grade','eselon'
+                'grade', 'eselon'
             ],
             'jabatan' => [
                 'name',
             ],
-            'subJabatan' => [
+            'subjabatan' => [
                 'name',
             ]
         ];
