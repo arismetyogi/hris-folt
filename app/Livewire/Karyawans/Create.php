@@ -8,11 +8,13 @@ use App\Models\Band;
 use App\Models\Bank;
 use App\Models\EmployeeLevel;
 use App\Models\EmployeeStatus;
+use App\Models\GradeEselon;
 use App\Models\Jabatan;
 use App\Models\Karyawan;
 use App\Models\StatusDesc;
 use App\Models\Subjabatan;
 use App\Models\UnitBisnis;
+use App\Models\Zip;
 use Filament\Forms\Components\Actions\Action;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Select;
@@ -25,7 +27,6 @@ use Filament\Forms\Form;
 use Filament\Forms\Get;
 use Filament\Forms\Set;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\View\View;
 use LivewireUI\Modal\ModalComponent;
 
@@ -67,7 +68,7 @@ class Create extends ModalComponent implements HasForms
             'religion' => $this->karyawan?->religion ?? null,
             'blood_type' => $this->karyawan?->blood_type ?? null,
             'zip_id' => $this->karyawan?->zip_id ?? null,
-            'enployee_status_id' => $this->karyawan?->enployee_status_id ?? null,
+            'enployee_status_id' => $this->karyawan?->employee_status_id ?? null,
             'jabatan_id' => $this->karyawan?->jabatan_id ?? null,
             'subjabatan_id' => $this->karyawan?->subjabatan_id ?? null,
             'band_id' => $this->karyawan?->band_id ?? null,
@@ -132,10 +133,10 @@ class Create extends ModalComponent implements HasForms
                             TextInput::make('npwp')
                                 ->label('NPWP')
                                 ->validationAttribute('NPWP')
-                                ->required()
                                 ->type('text')
                                 ->maxLength(16)
                                 ->reactive()
+                                ->required()
                                 ->afterStateUpdated(function (callable $set, $state) {
                                     // Ensure only numeric values remain
                                     $set('npwp', preg_replace('/\D/', '', $state));
@@ -153,7 +154,7 @@ class Create extends ModalComponent implements HasForms
                                 ->label('Jenis Kelamin')
                                 ->options(['L' => 'Laki-laki', 'P' => 'Perempuan'])
                                 ->required()
-                                ->live()
+                                ->live(onBlur: true)
                                 ->afterStateUpdated(function ($set, $state) {
                                     // Reset the 'pants_size' field when 'sex' changes
                                     $set('pants_size', null);
@@ -187,17 +188,24 @@ class Create extends ModalComponent implements HasForms
                             Select::make('zip_id')
                                 ->label('Kode Pos')
                                 ->placeholder('Pilih Kode Pos')
-                                ->relationship(
-                                    'zip',
-                                    'code',
-//                                    modifyQueryUsing: fn(Builder $query) => $query
-//                                        ->orderBy('code')
-//                                        ->orderBy('city')
-                                )
-                                ->live()
+                                ->getSearchResultsUsing(function (string $search) {
+                                    return Zip::query()
+                                        ->where('code', 'like', "%{$search}%")
+                                        ->orWhere('urban', 'like', "%{$search}%")
+                                        ->orWhere('subdistrict', 'like', "%{$search}%")
+                                        ->orWhere('city', 'like', "%{$search}%")
+                                        ->limit(10) // Limit the number of results to avoid performance issues
+                                        ->get()
+                                        ->mapWithKeys(function ($zip) {
+                                            return [
+                                                $zip->id => "{$zip->code} - {$zip->urban}, {$zip->subdistrict}"
+                                            ];
+                                        });
+                                })
+                                ->live(onBlur: true)
                                 ->reactive()
-                                ->getOptionLabelFromRecordUsing(fn ($record) => dd($record))
-                                ->searchable(['code', 'city', 'subdistrict']),
+                                ->searchable(['code', 'city', 'subdistrict'])
+                                ->nullable(),
                         ]),
 
                     Step::make('Professional Info')
@@ -208,19 +216,21 @@ class Create extends ModalComponent implements HasForms
                                     fn($livewire) => !(auth()->user()->isAdmin() || auth()->user()->isSuperAdmin())
                                 )
                                 ->default(auth()->user()->branch_id)
+                                ->options(UnitBisnis::all()->pluck('name', 'id'))
                                 ->getSearchResultsUsing(function (string $search) {
                                     return UnitBisnis::query()
-                                        ->whereAny(['name', 'code'], 'like', "%{$search}%")
-                                        ->limit(10)
+                                        ->where('name', 'like', "%{$search}%")
+                                        ->orWhere('code', 'like', "%{$search}%")
+                                        ->limit(10) // Limit the number of results to avoid performance issues
                                         ->get()
-                                        ->mapWithKeys(function ($branch) {
+                                        ->mapWithKeys(function ($department) {
                                             return [
-                                                $branch->id => "{$branch->id}",
+                                                $department->id => "{$department->code} - {$department->name}",
                                             ];
                                         });
                                 })
                                 ->searchable()
-                                ->live()
+                                ->live(onBlur: true)
                                 ->preload()
                                 ->afterStateUpdated(
                                     fn(Set $set) => $set('apotek_id', null))
@@ -233,7 +243,19 @@ class Create extends ModalComponent implements HasForms
                                         ->where('branch_id', $get('branch_id'))
                                         ->pluck('name', 'id')
                                 )
-                                ->live()
+                                ->getSearchResultsUsing(function (string $search) {
+                                    return Apotek::query()
+                                        ->where('name', 'like', "%{$search}%")
+                                        ->orWhere('sap_id', 'like', "%{$search}%")
+                                        ->limit(10) // Limit the number of results to avoid performance issues
+                                        ->get()
+                                        ->mapWithKeys(function ($apotek) {
+                                            return [
+                                                $apotek->id => "{$apotek->sap_id} - {$apotek->name}",
+                                            ];
+                                        });
+                                })
+                                ->live(onBlur: true)
                                 ->preload()
                                 ->searchable()
                                 ->label('Apotek')
@@ -254,7 +276,7 @@ class Create extends ModalComponent implements HasForms
                                 ->label('NPP')
                                 ->validationAttribute('NPP')
                                 ->unique(ignoreRecord: true)
-                                ->live()
+                                ->live(onBlur: true)
                                 ->type('text')
                                 ->maxLength(10)
                                 ->placeholder('19990101A')
@@ -277,11 +299,16 @@ class Create extends ModalComponent implements HasForms
                                 ->options(Band::all()->pluck('name', 'id'))
                                 ->label('Band')
                                 ->required(),
-                            Select::make('gradeeselon_id')
+                            Select::make('grade_eselon_id')
                                 ->label('Grade Eselon')
-                                ->getOptionLabelFromRecordUsing(
-                                    fn($record) => "{$record->grade} - {$record->eselon}")
-                                ->preload()
+                                ->options(GradeEselon::all()->pluck('grade', 'id'))
+                                ->getSearchResultsUsing(function (string $search) {
+                                    return GradeEselon::query()
+                                        ->where('grade', 'like', "%{$search}%")
+                                        ->orWhere('eselon', 'like', "%{$search}%")
+                                        ->get()
+                                        ->mapWithKeys(fn(GradeEselon $record) => [$record->id => "{$record->grade} - {$record->eselon}"]);
+                                })
                                 ->required(),
                             Select::make('area_id')
                                 ->options(Area::all()->pluck('name', 'id'))

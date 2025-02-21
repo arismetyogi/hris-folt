@@ -9,6 +9,6 @@ class GradeEselon extends Model
 {
     public function karyawans(): HasMany
     {
-        return $this->hasMany(Karyawan::class);
+        return $this->hasMany(Karyawan::class, 'grade_eselon_id');
     }
 }

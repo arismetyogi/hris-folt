@@ -19,12 +19,12 @@ class Karyawan extends Model
 
     public function apotek(): BelongsTo
     {
-        return $this->belongsTo(Apotek::class);
+        return $this->belongsTo(Apotek::class, 'apotek_id');
     }
 
     public function payrolls(): HasMany
     {
-        return $this->hasMany(Payroll::class);
+        return $this->hasMany(Payroll::class, 'karyawan_id');
     }
 
     public function area(): BelongsTo
@@ -72,7 +72,7 @@ class Karyawan extends Model
         return $this->belongsTo(Recruitment::class);
     }
 
-    public function zip(): BelongsToa
+    public function zip(): BelongsTo
     {
         return $this->belongsTo(Zip::class, 'zip_id');
     }
