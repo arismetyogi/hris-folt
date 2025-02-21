@@ -71,9 +71,12 @@ class Create extends ModalComponent implements HasForms
                                 ->label('NIK')
                                 ->validationAttribute('NIK')
                                 ->required(),
-                            TextInput::make('npp')
-                                ->label('NPP')
-                                ->validationAttribute('NPP')
+                            TextInput::make('npwp')
+                                ->label('NPWP')
+                                ->validationAttribute('NPWP')
+                                ->required(),
+                            DatePicker::make('date_of_birth')
+                                ->label('Tanggal Lahir')
                                 ->required(),
                         ]),
 
@@ -84,6 +87,10 @@ class Create extends ModalComponent implements HasForms
                                 ->options(UnitBisnis::all()->pluck('name', 'id'))
                                 ->label('Unit Bisnis')
                                 ->placeholder('Pilih Unit Bisnis')
+                                ->required(),
+                            TextInput::make('npp')
+                                ->label('NPP')
+                                ->validationAttribute('NPP')
                                 ->required(),
                             Select::make('jabatan_id')
                                 ->options(Jabatan::all()->pluck('name', 'id'))
@@ -102,14 +109,16 @@ class Create extends ModalComponent implements HasForms
                     Step::make('Contract Details')
                         ->columns(2)
                         ->schema([
-                            Select::make('contract_document_id')
+                            TextInput::make('contract_document_id')
                                 ->label('No Kontrak'),
                             TextInput::make('contract_sequence_no')
                                 ->label('Kontrak Ke-')
+                                ->rules('min:1|max:3')
                                 ->numeric(),
                             DatePicker::make('contract_start')
                                 ->label('Awal Kontrak'),
                             DatePicker::make('contract_end')
+                                ->after('contract_start')
                                 ->label('Akhir Kontrak'),
                         ]),
                     Step::make('Bank Account Details')

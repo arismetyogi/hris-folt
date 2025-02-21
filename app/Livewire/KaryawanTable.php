@@ -49,7 +49,7 @@ final class KaryawanTable extends PowerGridComponent
 
     public function datasource(): Builder
     {
-        return Karyawan::query()->with(['branch', 'apotek', 'zip', 'band', 'bank', 'employeeStatus', 'jabatan', 'subjabatan', 'gradeEselon', 'area', 'employeeLevel', 'recruitment']);
+        return Karyawan::query()->with(['branch', 'apotek', 'zip', 'band', 'bank', 'empStatus', 'jabatan', 'subjabatan', 'gradeEselon', 'area', 'empLevel', 'recruitment']);
     }
 
     public function relationSearch(): array
@@ -69,7 +69,7 @@ final class KaryawanTable extends PowerGridComponent
             'jabatan' => [
                 'name',
             ],
-            'subjabatan' => [
+            'subJabatan' => [
                 'name',
             ]
         ];
@@ -92,13 +92,13 @@ final class KaryawanTable extends PowerGridComponent
             ->add('religion')
             ->add('blood_type')
             ->add('zip_id', fn(Karyawan $model) => $model->zip->code ?? '')
-            ->add('employee_status_id', fn(Karyawan $model) => $model->employeeStatus->name ?? '')
+            ->add('employee_status_id', fn(Karyawan $model) => $model->empStatus->name ?? '')
             ->add('jabatan_id', fn(Karyawan $model) => $model->jabatan->name ?? '')
             ->add('subjabatan_id', fn(Karyawan $model) => $model->subjabatan->name ?? '')
             ->add('band_id', fn(Karyawan $model) => $model->band->name ?? '')
             ->add('grade_eselon_id', fn(Karyawan $model) => $model->gradeEselon->name ?? '')
             ->add('area_id', fn(Karyawan $model) => $model->area->name ?? '')
-            ->add('employee_level_id', fn(Karyawan $model) => $model->employeeLevel->name ?? '')
+            ->add('employee_level_id', fn(Karyawan $model) => $model->empLevel->name ?? '')
             ->add('saptitle_id')
             ->add('saptitle_name')
             ->add('date_hired_formatted', fn(Karyawan $model) => Carbon::parse($model->date_hired)->format('d/m/Y'))

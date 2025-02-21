@@ -62,9 +62,9 @@ class Karyawan extends Model
         return $this->belongsTo(Jabatan::class);
     }
 
-    public function subJabatan(): BelongsTo
+    public function subjabatan(): BelongsTo
     {
-        return $this->belongsTo(SubJabatan::class);
+        return $this->belongsTo(Subjabatan::class);
     }
 
     public function recruitment(): BelongsTo
