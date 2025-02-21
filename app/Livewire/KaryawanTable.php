@@ -39,7 +39,7 @@ final class KaryawanTable extends PowerGridComponent
                 ])
                 ->type(Exportable::TYPE_XLS, Exportable::TYPE_CSV),
             PowerGrid::header()
-                ->includeViewOnBottom()
+                ->includeViewOnTop('karyawans.top-component')
                 ->showSearchInput(),
             PowerGrid::footer()
                 ->showPerPage()
