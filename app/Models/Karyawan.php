@@ -26,4 +26,54 @@ class Karyawan extends Model
     {
         return $this->hasMany(Payroll::class);
     }
+
+    public function area(): BelongsTo
+    {
+        return $this->belongsTo(Area::class);
+    }
+
+    public function band(): BelongsTo
+    {
+        return $this->belongsTo(Band::class);
+    }
+
+    public function bank(): BelongsTo
+    {
+        return $this->belongsTo(Bank::class);
+    }
+
+    public function empLevel(): BelongsTo
+    {
+        return $this->belongsTo(EmployeeLevel::class);
+    }
+
+    public function empStatus(): BelongsTo
+    {
+        return $this->belongsTo(EmployeeStatus::class);
+    }
+
+    public function gradeEselon(): BelongsTo
+    {
+        return $this->belongsTo(GradeEselon::class);
+    }
+
+    public function jabatan(): BelongsTo
+    {
+        return $this->belongsTo(Jabatan::class);
+    }
+
+    public function subJabatan(): BelongsTo
+    {
+        return $this->belongsTo(SubJabatan::class);
+    }
+
+    public function recruitment(): BelongsTo
+    {
+        return $this->belongsTo(Recruitment::class);
+    }
+
+    public function zip(): BelongsTo
+    {
+        return $this->belongsTo(Zip::class);
+    }
 }

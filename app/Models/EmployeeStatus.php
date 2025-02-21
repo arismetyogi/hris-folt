@@ -9,6 +9,6 @@ class EmployeeStatus extends Model
 {
     public function karyawans(): HasMany
     {
-        return $this->hasMany(Karyawan::class, 'employee_status_id');
+        return $this->hasMany(Karyawan::class);
     }
 }

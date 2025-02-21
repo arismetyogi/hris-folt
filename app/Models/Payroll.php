@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Payroll extends Model
 {
-    public function karyawans(): BelongsTo
+    public function karyawanw(): BelongsTo
     {
         return $this->belongsTo(Karyawan::class);
     }

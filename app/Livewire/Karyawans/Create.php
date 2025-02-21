@@ -7,6 +7,7 @@ use App\Models\Jabatan;
 use App\Models\Karyawan;
 use App\Models\Subjabatan;
 use App\Models\UnitBisnis;
+use Filament\Forms\Components\Actions\Action;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
@@ -62,13 +63,17 @@ class Create extends ModalComponent implements HasForms
                         ->columns(2)
                         ->schema([
                             TextInput::make('name')
-                                ->label('Name')
+                                ->label('Nama')
+                                ->validationAttribute('Nama')
+                                ->validationMessages(['required'=>'Kolom :attribute tidak boleh kosong'])
                                 ->required(),
                             TextInput::make('nik')
                                 ->label('NIK')
+                                ->validationAttribute('NIK')
                                 ->required(),
                             TextInput::make('npp')
                                 ->label('NPP')
+                                ->validationAttribute('NPP')
                                 ->required(),
                         ]),
 
@@ -122,7 +127,23 @@ class Create extends ModalComponent implements HasForms
                                 ->label('Account Holder')
                                 ->required(),
                         ]),
-                ])->columns(8),
+                ])
+                    ->columns(8)
+                    ->key('karyawan_wizard')
+                    ->nextAction(fn ($get, $set) => Action::make('next')
+                        ->label('Next ➝')
+                        ->color('primary')
+                        ->extraAttributes([
+                            'class' => 'bg-blue-500 hover:bg-blue-700 text-white dark:bg-gray-700 dark:hover:bg-gray-600 transition',
+                        ])
+                    )
+                    ->previousAction(fn ($get, $set) => Action::make('previous')
+                        ->label('← Back')
+                        ->color('secondary')
+                        ->extraAttributes([
+                            'class' => 'bg-gray-300 hover:bg-gray-400 dark:bg-gray-700 dark:hover:bg-gray-600 text-black dark:text-white transition',
+                        ])
+                    ),
             ])->statePath('data');
     }
 

@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Province extends Model
 {
-    public function karyawans(): HasMany
+    public function zips(): HasMany
     {
         return $this->hasMany(Zip::class);
     }
