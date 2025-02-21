@@ -12,6 +12,7 @@
 
     <!-- Styles -->
     @livewireStyles
+    @filamentStyles()
 </head>
 <body x-data
       class="flex flex-col lg:min-h-screen bg-zinc-50 dark:bg-zinc-900">
@@ -24,6 +25,7 @@
 @livewire('wire-elements-modal')
 @stack('js')
 @wireUiScripts
+@filamentScripts()
 
 <script>
     if (localStorage.getItem("theme") === "dark" ||
