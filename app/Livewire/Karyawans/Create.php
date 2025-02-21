@@ -2,15 +2,20 @@
 
 namespace App\Livewire\Karyawans;
 
-use App\Models\Apotek;
+use App\Models\Bank;
+use App\Models\Jabatan;
 use App\Models\Karyawan;
+use App\Models\Subjabatan;
 use App\Models\UnitBisnis;
+use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Wizard;
+use Filament\Forms\Components\Wizard\Step;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
 use Filament\Forms\Form;
-use Livewire\Component;
+use Illuminate\View\View;
 use LivewireUI\Modal\ModalComponent;
 
 class Create extends ModalComponent implements HasForms
@@ -19,12 +24,18 @@ class Create extends ModalComponent implements HasForms
 
     public ?array $data = [];
     public ?Karyawan $karyawan = null;
+    public $editMode = false;
 
-    public function mount(?int $id): void
+    public static function modalMaxWidth(): string
     {
-        $this->karyawan = $id ? Karyawan::with(['branch','apotek'])->find($id) : null;
+        return '5xl';
+    }
 
-        if (!$this->apotek && $id) {
+    public function mount(?int $id = null): void
+    {
+        $this->karyawan = $id ? Karyawan::with(['branch', 'apotek'])->find($id) : null;
+
+        if (!$this->karyawan && $id) {
             abort(404, 'Karyawan not found');
         }
 
@@ -35,7 +46,7 @@ class Create extends ModalComponent implements HasForms
     private function getKaryawanData(): array
     {
         return [
-            'bramch_id' => $this->karyawan?->branch_id ?? null,
+            'branch_id' => $this->karyawan?->branch_id ?? null,
             'name' => $this->karyawan?->name ?? null,
             'nik' => $this->karyawan?->nik ?? null,
             'npwp' => $this->karyawan?->npwp ?? null,
@@ -46,30 +57,73 @@ class Create extends ModalComponent implements HasForms
     {
         return $form
             ->schema([
-                Select::make('branch_id')
-                    ->label('Unit Bisnis')
-                    ->required(),
-                TextInput::make('name')
-                    ->label('Name')
-                    ->required(),
-                Select::make('store_type')
-                    ->options([
-                        'BASIC_HEALTH' => 'Basic Health',
-                        'SUPER_STORE' => 'Super Store',
-                        'HEALTH_AND_CARE' => 'Health & Care',
-                        'MEDICAL' => 'Medical',
-                        'CHILD' => 'Child',
-                        'NEW' => 'New',
-                        null => 'None',
-                    ])
-                    ->label('Type Store')
-                    ->required(),
-                Select::make('branch_id')
-                    ->options(UnitBisnis::all()->pluck('name', 'id'))
-                    ->label('Unit Bisnis')
-                    ->required(),
-            ])
-            ->statePath('data');
+                Wizard::make([
+                    Step::make('Personal Info')
+                        ->columns(2)
+                        ->schema([
+                            TextInput::make('name')
+                                ->label('Name')
+                                ->required(),
+                            TextInput::make('nik')
+                                ->label('NIK')
+                                ->required(),
+                            TextInput::make('npp')
+                                ->label('NPP')
+                                ->required(),
+                        ]),
+
+                    Step::make('Professional Info')
+                        ->columns(2)
+                        ->schema([
+                            Select::make('branch_id')
+                                ->options(UnitBisnis::all()->pluck('name', 'id'))
+                                ->label('Unit Bisnis')
+                                ->placeholder('Pilih Unit Bisnis')
+                                ->required(),
+                            Select::make('jabatan_id')
+                                ->options(Jabatan::all()->pluck('name', 'id'))
+                                ->label('Position')
+                                ->required(),
+                            Select::make('subjabatan_id')
+                                ->options(Subjabatan::all()->pluck('name', 'id'))
+                                ->label('Sub Jabatan')
+                                ->required(),
+                            TextInput::make('sap_id')
+                                ->label('ID SAP')
+                                ->required()
+                                ->numeric(),
+                        ]),
+
+                    Step::make('Contract Details')
+                        ->columns(2)
+                        ->schema([
+                            Select::make('contract_document_id')
+                                ->label('No Kontrak'),
+                            TextInput::make('contract_sequence_no')
+                                ->label('Kontrak Ke-')
+                                ->numeric(),
+                            DatePicker::make('contract_start')
+                                ->label('Awal Kontrak'),
+                            DatePicker::make('contract_end')
+                                ->label('Akhir Kontrak'),
+                        ]),
+                    Step::make('Bank Account Details')
+                        ->columns(2)
+                        ->schema([
+                            Select::make('bank_id')
+                                ->options(Bank::all()->pluck('name', 'id'))
+                                ->label('Bank Name')
+                                ->required(),
+                            TextInput::make('account_no')
+                                ->label('Account Number')
+                                ->required()
+                                ->numeric(),
+                            TextInput::make('account_name')
+                                ->label('Account Holder')
+                                ->required(),
+                        ]),
+                ])->columns(8),
+            ])->statePath('data');
     }
 
     public function save(): void
@@ -77,18 +131,19 @@ class Create extends ModalComponent implements HasForms
         $state = $this->form->getState();
         $this->validate();
 
-        if ($this->apotek) {
-            // Update existing apotek
-            $this->apotek->update($state);
+        if ($this->karyawan) {
+            // Update existing karyawan
+            $this->karyawan->update($state);
         } else {
-            // Create new apotek
-            Apotek::create($state);
+            // Create new karyawan
+            Karyawan::create($state);
         }
 
         $this->closeModal();
-        $this->dispatch('refreshApotekTable');
+        $this->dispatch('refreshKaryawanTable');
     }
-    public function render()
+
+    public function render(): View
     {
         return view('livewire.karyawans.create');
     }

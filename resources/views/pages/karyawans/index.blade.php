@@ -11,7 +11,7 @@ name('karyawans.index');
 
 <x-layouts.app>
     <x-app.heading
-        title="Users"
+        title="Karyawan"
         description="Manage Data Karyawan"
         :border="false"
     />
