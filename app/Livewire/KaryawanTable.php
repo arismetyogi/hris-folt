@@ -39,7 +39,6 @@ final class KaryawanTable extends PowerGridComponent
                 ])
                 ->type(Exportable::TYPE_XLS, Exportable::TYPE_CSV),
             PowerGrid::header()
-                ->includeViewOnBottom()
                 ->showSearchInput(),
             PowerGrid::footer()
                 ->showPerPage()
@@ -321,18 +320,18 @@ final class KaryawanTable extends PowerGridComponent
     {
         return [
             Filter::select('branch_name', 'branch_id')
-                ->dataSource(UnitBisnis::all())
+                ->dataSource(UnitBisnis::all()->pluck('name', 'id'))
                 ->optionValue('id')
                 ->optionLabel('name'),
             Filter::select('apotek_name', 'apotek_id')
-                ->dataSource(Apotek::all())
+                ->dataSource(Apotek::all()->pluck('name', 'id'))
                 ->optionValue('id')
                 ->optionLabel('name'),
-            Filter::datepicker('date_hired'),
-            Filter::datepicker('date_promoted'),
-            Filter::datepicker('date_last_mutated'),
-            Filter::datepicker('contract_start'),
-            Filter::datepicker('contract_end'),
+//            Filter::datepicker('date_hired'),
+//            Filter::datepicker('date_promoted'),
+//            Filter::datepicker('date_last_mutated'),
+//            Filter::datepicker('contract_start'),
+//            Filter::datepicker('contract_end'),
         ];
     }
 
