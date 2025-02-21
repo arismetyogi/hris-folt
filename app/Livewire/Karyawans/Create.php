@@ -17,8 +17,10 @@ use App\Models\UnitBisnis;
 use App\Models\Zip;
 use Filament\Forms\Components\Actions\Action;
 use Filament\Forms\Components\DatePicker;
+use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Toggle;
 use Filament\Forms\Components\Wizard;
 use Filament\Forms\Components\Wizard\Step;
 use Filament\Forms\Concerns\InteractsWithForms;
@@ -59,16 +61,19 @@ class Create extends ModalComponent implements HasForms
     {
         return [
             'branch_id' => $this->karyawan?->branch_id ?? null,
+            'apotek_id' => $this->karyawan?->apotek_id ?? null,
+            'sap_id' => $this->karyawan?->sap_id ?? null,
+            'npp' => $this->karyawan?->npp ?? null,
             'name' => $this->karyawan?->name ?? null,
             'nik' => $this->karyawan?->nik ?? null,
             'date_of_birth' => $this->karyawan?->date_of_birth ?? null,
             'sex' => $this->karyawan?->sex ?? null,
-            'addres' => $this->karyawan?->addres ?? null,
+            'address' => $this->karyawan?->address ?? null,
             'phone' => $this->karyawan?->phone ?? null,
             'religion' => $this->karyawan?->religion ?? null,
             'blood_type' => $this->karyawan?->blood_type ?? null,
             'zip_id' => $this->karyawan?->zip_id ?? null,
-            'enployee_status_id' => $this->karyawan?->employee_status_id ?? null,
+            'employee_status_id' => $this->karyawan?->employee_status_id ?? null,
             'jabatan_id' => $this->karyawan?->jabatan_id ?? null,
             'subjabatan_id' => $this->karyawan?->subjabatan_id ?? null,
             'band_id' => $this->karyawan?->band_id ?? null,
@@ -120,7 +125,7 @@ class Create extends ModalComponent implements HasForms
                             TextInput::make('nik')
                                 ->label('NIK')
                                 ->validationAttribute('NIK')
-                                ->unique(Karyawan::class, 'nik', ignoreRecord: true)
+                                ->unique(ignoreRecord: true)
                                 ->maxlength(16)
                                 ->placeholder('19001030102200001')
                                 ->rules('string|max:16|min:16')
@@ -129,17 +134,6 @@ class Create extends ModalComponent implements HasForms
                                 ->afterStateUpdated(function (callable $set, $state) {
                                     // Ensure only numeric values remain
                                     $set('nik', preg_replace('/\D/', '', $state));
-                                }),
-                            TextInput::make('npwp')
-                                ->label('NPWP')
-                                ->validationAttribute('NPWP')
-                                ->type('text')
-                                ->maxLength(16)
-                                ->reactive()
-                                ->required()
-                                ->afterStateUpdated(function (callable $set, $state) {
-                                    // Ensure only numeric values remain
-                                    $set('npwp', preg_replace('/\D/', '', $state));
                                 }),
                             DatePicker::make('date_of_birth')
                                 ->label('Tanggal Lahir')
@@ -314,7 +308,7 @@ class Create extends ModalComponent implements HasForms
                                 ->options(Area::all()->pluck('name', 'id'))
                                 ->label('Area')
                                 ->required(),
-                            Select::make('emplevel_id')
+                            Select::make('employee_level_id')
                                 ->options(EmployeeLevel::all()->pluck('name', 'id'))
                                 ->label('Level Pegawai')
                                 ->required(),
@@ -414,6 +408,45 @@ class Create extends ModalComponent implements HasForms
                                     $set('bpjstk_id', preg_replace('/\D/', '', $state));
                                 })
                         ]),
+
+                    Step::make('Tax Details')
+                        ->columns(2)
+                        ->schema([
+                            TextInput::make('npwp')
+                                ->label('NPWP')
+                                ->validationAttribute('NPWP')
+                                ->type('text')
+                                ->maxLength(16)
+                                ->reactive()
+                                ->required()
+                                ->afterStateUpdated(function (callable $set, $state) {
+                                    // Ensure only numeric values remain
+                                    $set('npwp', preg_replace('/\D/', '', $state));
+                                }),
+                            Select::make('status_pasangan')
+                                ->label('Status Pasangan')
+                                ->options(['TK', 'K0', 'K1', 'K2', 'K3'])
+                                ->required(),
+                            TextInput::make('jumlah_tanggungan')
+                                ->numeric()
+                                ->maxValue(3)
+                                ->label('Jumlah Tanggungan')
+                                ->required(),
+                            Toggle::make('pasangan_ditanggung_pajak')
+                                ->label('Pasangan Ditanggung Pajak')
+                                ->required(),
+                            Section::make('Informasi Seragam')
+                                ->schema([
+                                    Select::make('pants_size')
+                                        ->label('Pants Size')
+                                        ->options(['S', 'M', 'L', 'XL', 'XXL', 'XXXL', '4XL', '5XL', '6XL', '7XL', '8XL', '9XL'])
+                                        ->required(),
+                                    Select::make('shirt_size')
+                                        ->label('Shirt Size')
+                                        ->options(['S', 'M', 'L', 'XL', 'XXL', 'XXXL', '4XL', '5XL', '6XL', '7XL', '8XL', '9XL'])
+                                        ->required(),
+                                ])
+                        ]),
                 ])
                     ->columns(8)
                     ->key('karyawan_wizard')
@@ -448,7 +481,7 @@ class Create extends ModalComponent implements HasForms
         }
 
         $this->closeModal();
-        $this->dispatch('refreshKaryawanTable');
+        $this->dispatch('record-updated');
     }
 
     public function render(): View

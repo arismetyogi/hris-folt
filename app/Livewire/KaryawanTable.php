@@ -355,7 +355,7 @@ final class KaryawanTable extends PowerGridComponent
     }
 
     protected $listeners = [
-        'refreshKaryawanTable' => '$refresh', //refresh table from event
+        //refresh table from events
         'record-deleted' => '$refresh',
         'record-updated' => '$refresh',
     ];
