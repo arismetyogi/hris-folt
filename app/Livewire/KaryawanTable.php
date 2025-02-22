@@ -7,6 +7,7 @@ use App\Models\Karyawan;
 use App\Models\UnitBisnis;
 use Illuminate\Support\Carbon;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Facades\Cache;
 use PowerComponents\LivewirePowerGrid\Column;
 use PowerComponents\LivewirePowerGrid\Components\SetUp\Exportable;
 use PowerComponents\LivewirePowerGrid\Facades\Filter;
@@ -317,13 +318,21 @@ final class KaryawanTable extends PowerGridComponent
 
     public function filters(): array
     {
+        $unitBisnis = Cache::remember('unit_bisnis_list', now()->addMinutes(10), function () {
+            return UnitBisnis::all();
+        });
+
+        $apotek = Cache::remember('apotek_list', now()->addMinutes(10), function () {
+            return Apotek::all();
+        });
+
         return [
             Filter::select('branch_name', 'branch_id')
-                ->dataSource(UnitBisnis::all())
+                ->dataSource($unitBisnis)
                 ->optionValue('id')
                 ->optionLabel('name'),
             Filter::select('apotek_name', 'apotek_id')
-                ->dataSource(Apotek::all())
+                ->dataSource($apotek)
                 ->optionValue('id')
                 ->optionLabel('name'),
             Filter::datepicker('date_hired'),
