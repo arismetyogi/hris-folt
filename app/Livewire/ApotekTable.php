@@ -159,7 +159,7 @@ final class ApotekTable extends PowerGridComponent
                 )
                 ->optionValue('id')
                 ->optionLabel('name'),
-            Filter::select('province_name', 'province_name')
+        Filter::select('province_name', 'province_name')
                 ->dataSource($this->provinces)
                 ->optionValue('id')
                 ->optionLabel('name'),

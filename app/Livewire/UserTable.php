@@ -30,15 +30,14 @@ final class UserTable extends PowerGridComponent
 
     public bool $showFilters = true;
 
-    public $unitBisnis;
+    public $unitBisnis, $roles;
 
     public function boot(): void
     {
         config(['livewire-powergrid.filter' => 'outside']);
 
-        $this->unitBisnis = Cache::remember('unit_bisnis_list', now()->addMinutes(10), function () {
-            return UnitBisnis::all();
-        });
+        $this->unitBisnis = Cache::remember('unit_bisnis_list', now()->addMinutes(10), fn() => UnitBisnis::all());
+        $this->roles = Cache::remember('unit_bisnis_list', now()->addMinutes(10), fn() => Role::all());
     }
 
     public function setUp(): array
@@ -177,7 +176,7 @@ final class UserTable extends PowerGridComponent
                 ->optionValue('id')
                 ->optionLabel('name'),
             Filter::select('roles', 'roles.name')
-                ->dataSource(Role::all())
+                ->dataSource($this->roles)
                 ->optionValue('name')
                 ->optionLabel('name')
                 ->builder(function ($builder, $value) {
