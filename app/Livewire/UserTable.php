@@ -105,7 +105,7 @@ final class UserTable extends PowerGridComponent
             ->add('permissions_details', fn($user) => $user->getAllPermissions()->implode('name', ', '))
             ->add('is_active')
             ->add('created_at_formatted', fn(User $model) => Carbon::parse($model->created_at)->format('d/m/Y H:i:s'))
-            ->add('unit_bisnis', fn($user) => e($user->unitBisnis->name ?? null))
+            ->add('unit_bisnis', fn($user) => e($user->unitBisnis()->name ?? null))
             ->add('branch_name', function ($user) use ($options) {
                 return Blade::render('<x-select type="occurrence" :options=$options :modelId=$userId :selected=$selected/>', ['options' => $options, 'userId' => intval($user->id), 'selected' => intval($user->branch_id)]);
             })

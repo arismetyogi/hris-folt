@@ -7,8 +7,6 @@ use App\Models\Karyawan;
 use App\Models\UnitBisnis;
 use Illuminate\Support\Carbon;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Support\Facades\DB;
-use PowerComponents\LivewirePowerGrid\Button;
 use PowerComponents\LivewirePowerGrid\Column;
 use PowerComponents\LivewirePowerGrid\Components\SetUp\Exportable;
 use PowerComponents\LivewirePowerGrid\Facades\Filter;
@@ -49,7 +47,7 @@ final class KaryawanTable extends PowerGridComponent
 
     public function datasource(): Builder
     {
-        return Karyawan::query()->with(['branch', 'apotek', 'area', 'band', 'bank', 'empLevel', 'empStatus', 'gradeEselon', 'jabatan', 'subjabatan', 'statusDesc', 'recruitment', 'zip']);
+        return Karyawan::query()->with(['branch:id,name', 'apotek:id,name', 'area:id,name', 'band:id,name', 'bank:id,name', 'empLevel:id,name', 'empStatus:id,name', 'gradeEselon:id,grade,eselon', 'jabatan:id,name', 'subjabatan:id,name', 'statusDesc:id,name', 'recruitment:id,name', 'zip:id,code']);
     }
 
     public function relationSearch(): array
@@ -79,8 +77,8 @@ final class KaryawanTable extends PowerGridComponent
     {
         return PowerGrid::fields()
             ->add('id')
-            ->add('branch_id', fn(Karyawan $model) => $model->branch->name ?? '')
-            ->add('apotek_id', fn(Karyawan $model) => $model->apotek->name ?? '')
+            ->add('branch_id', fn(Karyawan $model) => $model->branch?->name ?? '')
+            ->add('apotek_id', fn(Karyawan $model) => $model->apotek?->name ?? '')
             ->add('sap_id')
             ->add('npp')
             ->add('nik')
@@ -91,20 +89,20 @@ final class KaryawanTable extends PowerGridComponent
             ->add('phone')
             ->add('religion')
             ->add('blood_type')
-            ->add('zip_id', fn(Karyawan $model) => $model->zip->code ?? '')
-            ->add('employee_status_id', fn(Karyawan $model) => $model->empStatus->name ?? '')
-            ->add('jabatan_id', fn(Karyawan $model) => $model->jabatan->name ?? '')
-            ->add('subjabatan_id', fn(Karyawan $model) => $model->subjabatan->name ?? '')
-            ->add('band_id', fn(Karyawan $model) => $model->band->name ?? '')
-            ->add('grade_eselon_id', fn(Karyawan $model) => $model->gradeEselon->name ?? '')
-            ->add('area_id', fn(Karyawan $model) => $model->area->name ?? '')
-            ->add('employee_level_id', fn(Karyawan $model) => $model->empLevel->name ?? '')
+            ->add('zip_id', fn(Karyawan $model) => $model->zip?->code ?? '')
+            ->add('employee_status_id', fn(Karyawan $model) => $model->empStatus?->name ?? '')
+            ->add('jabatan_id', fn(Karyawan $model) => $model->jabatan?->name ?? '')
+            ->add('subjabatan_id', fn(Karyawan $model) => $model->subjabatan?->name ?? '')
+            ->add('band_id', fn(Karyawan $model) => $model->band?->name ?? '')
+            ->add('grade_eselon_id', fn(Karyawan $model) => $model->gradeEselon?->name ?? '')
+            ->add('area_id', fn(Karyawan $model) => $model->area?->name ?? '')
+            ->add('employee_level_id', fn(Karyawan $model) => $model->empLevel?->name ?? '')
             ->add('saptitle_id')
             ->add('saptitle_name')
             ->add('date_hired_formatted', fn(Karyawan $model) => Carbon::parse($model->date_hired)->format('d/m/Y'))
             ->add('date_promoted_formatted', fn(Karyawan $model) => Carbon::parse($model->date_promoted)->format('d/m/Y'))
             ->add('date_last_mutated_formatted', fn(Karyawan $model) => Carbon::parse($model->date_last_mutated)->format('d/m/Y'))
-            ->add('status_desc_id', fn(Karyawan $model) => $model->statusDesc->name ?? '')
+            ->add('status_desc_id', fn(Karyawan $model) => $model->statusDesc?->name ?? '')
             ->add('bpjs_id')
             ->add('bpjstk_id')
             ->add('insured_member_count')
@@ -120,8 +118,8 @@ final class KaryawanTable extends PowerGridComponent
             ->add('pasangan_ditanggung_pajak')
             ->add('account_no')
             ->add('account_name')
-            ->add('bank_id', fn(Karyawan $model) => $model->bank->name ?? '')
-            ->add('recruitment_id', fn(Karyawan $model) => $model->recruitment->name ?? '')
+            ->add('bank_id', fn(Karyawan $model) => $model->bank?->name ?? '')
+            ->add('recruitment_id', fn(Karyawan $model) => $model->recruitment?->name ?? '')
             ->add('pants_size')
             ->add('shirt_size')
             ->add('created_at_formatted', fn(Karyawan $model) => Carbon::parse($model->created_at)->format('d/m/Y H:i:s'))
