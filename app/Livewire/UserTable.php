@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Blade;
+use Illuminate\Support\Facades\Cache;
 use Livewire\Attributes\On;
 use PowerComponents\LivewirePowerGrid\Button;
 use PowerComponents\LivewirePowerGrid\Column;
@@ -29,9 +30,15 @@ final class UserTable extends PowerGridComponent
 
     public bool $showFilters = true;
 
+    public $unitBisnis;
+
     public function boot(): void
     {
         config(['livewire-powergrid.filter' => 'outside']);
+
+        $this->unitBisnis = Cache::remember('unit_bisnis_list', now()->addMinutes(10), function () {
+            return UnitBisnis::all();
+        });
     }
 
     public function setUp(): array
@@ -56,7 +63,7 @@ final class UserTable extends PowerGridComponent
 
     public function datasource(): Builder
     {
-        return User::query()->with(['unitBisnis', 'roles', 'permissions']);
+        return User::query()->with(['unitBisnis:id,name', 'roles', 'permissions']);
     }
 
     public function relationSearch(): array
@@ -105,7 +112,7 @@ final class UserTable extends PowerGridComponent
             ->add('permissions_details', fn($user) => $user->getAllPermissions()->implode('name', ', '))
             ->add('is_active')
             ->add('created_at_formatted', fn(User $model) => Carbon::parse($model->created_at)->format('d/m/Y H:i:s'))
-            ->add('unit_bisnis', fn($user) => e($user->unitBisnis()->name ?? null))
+            ->add('unit_bisnis', fn($user) => e($user->unitBisnis?->name ?? null))
             ->add('branch_name', function ($user) use ($options) {
                 return Blade::render('<x-select type="occurrence" :options=$options :modelId=$userId :selected=$selected/>', ['options' => $options, 'userId' => intval($user->id), 'selected' => intval($user->branch_id)]);
             })
@@ -166,7 +173,7 @@ final class UserTable extends PowerGridComponent
     {
         return [
             Filter::select('branch_name', 'branch_id')
-                ->dataSource(UnitBisnis::all())
+                ->dataSource($this->unitBisnis)
                 ->optionValue('id')
                 ->optionLabel('name'),
             Filter::select('roles', 'roles.name')
@@ -241,7 +248,7 @@ final class UserTable extends PowerGridComponent
 
     public function branchSelectOptions(): Collection
     {
-        return UnitBisnis::all(['id', 'name'])
+        return $this->unitBisnis
             ->mapWithKeys(function ($item) {
                 return [
                     $item->id => $item->name,
