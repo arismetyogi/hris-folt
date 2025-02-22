@@ -28,10 +28,9 @@ final class KaryawanTable extends PowerGridComponent
     {
         config(['livewire-powergrid.filter' => 'outside']);
 
+        $this->unitBisnis = Cache::remember('unit_bisnis_list', now()->addMinutes(10), fn() => UnitBisnis::all());
 
-        $unitBisnis = Cache::remember('unit_bisnis_list', now()->addMinutes(10), fn() => UnitBisnis::all());
-
-        $apotek = Cache::remember('apotek_list', now()->addMinutes(10), fn() => Apotek::all());
+        $this->apoteks = Cache::remember('apotek_list', now()->addMinutes(10), fn() => Apotek::all());
     }
 
     public function setUp(): array
@@ -332,7 +331,7 @@ final class KaryawanTable extends PowerGridComponent
                 ->optionValue('id')
                 ->optionLabel('name'),
             Filter::select('apotek_name', 'apotek_id')
-                ->dataSource($this->apotek)
+                ->dataSource($this->apoteks)
                 ->optionValue('id')
                 ->optionLabel('name'),
             Filter::datepicker('date_hired'),
