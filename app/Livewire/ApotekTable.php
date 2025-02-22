@@ -8,6 +8,7 @@ use App\Models\UnitBisnis;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Blade;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use PowerComponents\LivewirePowerGrid\Button;
 use PowerComponents\LivewirePowerGrid\Column;
@@ -27,10 +28,17 @@ final class ApotekTable extends PowerGridComponent
 
     public bool $showFilters = true;
 
+    public $unitBisnis, $provinces, $apoteks;
+
     public function boot(): void
     {
         config(['livewire-powergrid.filter' => 'outside']);
+
+        $this->unitBisnis = Cache::remember('unit_bisnis_list', now()->addMinutes(10), fn() => UnitBisnis::all());
+        $this->provinces = Cache::remember('unit_bisnis_list', now()->addMinutes(10), fn() => Province::all());
+        $this->apoteks = Cache::remember('unit_bisnis_list', now()->addMinutes(10), fn() => Apotek::all());
     }
+
     public function setUp(): array
     {
         return [
@@ -51,7 +59,7 @@ final class ApotekTable extends PowerGridComponent
 
     public function datasource(): Builder
     {
-        return Apotek::query()->with(['branch', 'zip', 'karyawans', 'province']);
+        return Apotek::query()->with(['branch:id,name', 'zip', 'karyawans', 'province']);
     }
 
     public function relationSearch(): array
@@ -98,7 +106,7 @@ final class ApotekTable extends PowerGridComponent
             ->add('latitude')
             ->add('longitude')
             ->add('phone')
-            ->add('zip', fn($apotek) => e($apotek->zip->code ?? null))
+            ->add('zip', fn($apotek) => e($apotek->zip?->code ?? null))
             ->add('created_at_formatted', fn(Apotek $model) => Carbon::parse($model->created_at)->format('d/m/Y H:i:s'))
             ->add('action', function (Apotek $model) {
                 return view('livewire.action-dropdown', [
@@ -118,7 +126,8 @@ final class ApotekTable extends PowerGridComponent
             Column::make('Branch', 'branch_name', 'branch_id')
                 ->sortable()
                 ->searchable(),
-            Column::make('Store Type', 'store_type'),
+            Column::make('Store Type', 'store_type')
+                ->sortable(),
             Column::make('Operational Date', 'operational_date')
                 ->sortable(),
             Column::make('Address', 'address'),
@@ -137,21 +146,21 @@ final class ApotekTable extends PowerGridComponent
     {
         return [
             Filter::select('branch_name', 'branch_id')
-                ->dataSource(UnitBisnis::all())
+                ->dataSource($this->unitBisnis)
                 ->optionValue('id')
                 ->optionLabel('name'),
             Filter::select('store_type', 'store_type')
-                ->dataSource(DB::table('apoteks')
-                    ->select('store_type')
-                    ->distinct()
-                    ->get()
-                    ->map(fn($item) => ['id' => $item->store_type, 'name' => $item->store_type])
+                ->dataSource($this->apoteks
+                    ->pluck('store_type')
+                    ->unique()
+                    ->map(fn($item) => ['id' => $item->store_type ?? null, 'name' => $item->store_type ?? null])
+                    ->values()
                     ->toArray()
                 )
                 ->optionValue('id')
                 ->optionLabel('name'),
             Filter::select('province_name', 'province_name')
-                ->dataSource(Province::all())
+                ->dataSource($this->provinces)
                 ->optionValue('id')
                 ->optionLabel('name'),
             Filter::datepicker('operational_date'),

@@ -38,8 +38,6 @@ class Create extends ModalComponent implements HasForms
 
     public ?array $data = [];
     public ?Karyawan $karyawan = null;
-    public $editMode = false;
-
     public static function modalMaxWidth(): string
     {
         return '6xl';
