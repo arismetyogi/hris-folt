@@ -33,6 +33,7 @@ class CreateNewUser implements CreatesNewUsers
             'username' => $input['username'],
             'email' => $input['email'],
             'password' => bcrypt($input['password']),
+            'is_active' => 0,
         ])->assignRole(Roles::User->value);
     }
 }

@@ -42,11 +42,15 @@ class FortifyServiceProvider extends ServiceProvider
                 ->orWhere('username', $request->creds)
                 ->first();
 
+            if(!$user) {
+                return false;
+            }
+
             if (!$user->is_active) {
                 throw ValidationException::withMessages(['email' => 'Your account is inactive. Contact site administrator to activate your account.']);
             }
 
-            if ($user && Hash::check($request->password, $user->password)) {
+            if (Hash::check($request->password, $user->password)) {
                 return $user;
             }
             return false;

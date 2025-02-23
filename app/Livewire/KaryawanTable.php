@@ -2,6 +2,7 @@
 
 namespace App\Livewire;
 
+use App\Enums\Roles;
 use App\Models\Apotek;
 use App\Models\Karyawan;
 use App\Models\UnitBisnis;
@@ -54,7 +55,12 @@ final class KaryawanTable extends PowerGridComponent
 
     public function datasource(): Builder
     {
-        return Karyawan::query()->with(['branch:id,name', 'apotek:id,name', 'area:id,name', 'band:id,name', 'bank:id,name', 'empLevel:id,name', 'empStatus:id,name', 'gradeEselon:id,grade,eselon', 'jabatan:id,name', 'subjabatan:id,name', 'statusDesc:id,name', 'recruitment:id,name', 'zip:id,code']);
+        $user = auth()->user();
+        if ($user->hasRole(Roles::SuperAdmin->value)) {
+            return Karyawan::query()->with(['branch:id,name', 'apotek:id,name', 'area:id,name', 'band:id,name', 'bank:id,name', 'empLevel:id,name', 'empStatus:id,name', 'gradeEselon:id,grade,eselon', 'jabatan:id,name', 'subjabatan:id,name', 'statusDesc:id,name', 'recruitment:id,name', 'zip:id,code']);
+        } else {
+            return Karyawan::query()->where('branch_id', '=', $user->branch_id)->with(['branch:id,name', 'apotek:id,name', 'area:id,name', 'band:id,name', 'bank:id,name', 'empLevel:id,name', 'empStatus:id,name', 'gradeEselon:id,grade,eselon', 'jabatan:id,name', 'subjabatan:id,name', 'statusDesc:id,name', 'recruitment:id,name', 'zip:id,code']);
+        }
     }
 
     public function relationSearch(): array

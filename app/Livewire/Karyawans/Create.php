@@ -28,7 +28,6 @@ use Filament\Forms\Contracts\HasForms;
 use Filament\Forms\Form;
 use Filament\Forms\Get;
 use Filament\Forms\Set;
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\View\View;
 use LivewireUI\Modal\ModalComponent;
 
@@ -205,24 +204,21 @@ class Create extends ModalComponent implements HasForms
                         ->schema([
                             Select::make('branch_id')
                                 ->disabled(
-                                    fn($livewire) => !(auth()->user()->isAdmin() || auth()->user()->isSuperAdmin())
-                                )
+                                    fn($livewire) => !auth()->user()->isSuperAdmin())
                                 ->default(auth()->user()->branch_id)
+                                ->formatStateUsing(fn($state) => $state ?? auth()->user()->branch_id)
                                 ->options(UnitBisnis::all()->pluck('name', 'id'))
                                 ->getSearchResultsUsing(function (string $search) {
                                     return UnitBisnis::query()
-                                        ->where('name', 'like', "%{$search}%")
-                                        ->orWhere('code', 'like', "%{$search}%")
-                                        ->limit(10) // Limit the number of results to avoid performance issues
+                                        ->whereAny(['name', 'code'], 'like', "%{$search}%")
+                                        ->limit(10)
                                         ->get()
-                                        ->mapWithKeys(function ($department) {
-                                            return [
-                                                $department->id => "{$department->code} - {$department->name}",
-                                            ];
-                                        });
+                                        ->mapWithKeys(fn($branch) => [
+                                            $branch->id => "{$branch->code} - {$branch->name}",
+                                        ]);
                                 })
                                 ->searchable()
-                                ->live(onBlur: true)
+                                ->live()
                                 ->preload()
                                 ->afterStateUpdated(
                                     fn(Set $set) => $set('apotek_id', null))
@@ -237,17 +233,14 @@ class Create extends ModalComponent implements HasForms
                                 )
                                 ->getSearchResultsUsing(function (string $search) {
                                     return Apotek::query()
-                                        ->where('name', 'like', "%{$search}%")
-                                        ->orWhere('sap_id', 'like', "%{$search}%")
-                                        ->limit(10) // Limit the number of results to avoid performance issues
+                                        ->whereAny(['name','sap_id'], 'like', "%{$search}%")
+                                        ->limit(10)
                                         ->get()
-                                        ->mapWithKeys(function ($apotek) {
-                                            return [
-                                                $apotek->id => "{$apotek->sap_id} - {$apotek->name}",
-                                            ];
-                                        });
+                                        ->mapWithKeys(fn($apotek) => [
+                                            $apotek->id => "{$apotek->sap_id} - {$apotek->name}",
+                                        ]);
                                 })
-                                ->live(onBlur: true)
+                                ->live()
                                 ->preload()
                                 ->searchable()
                                 ->label('Apotek')
@@ -268,11 +261,15 @@ class Create extends ModalComponent implements HasForms
                                 ->label('NPP')
                                 ->validationAttribute('NPP')
                                 ->unique(ignoreRecord: true)
-                                ->live(onBlur: true)
+                                ->live()
                                 ->type('text')
                                 ->maxLength(10)
                                 ->placeholder('19990101A')
                                 ->rules(['regex:/^\d{8}[A-Z]{1,2}$/'])
+                                ->afterStateUpdated(function (callable $set, $state) {
+                                    // Ensure only numeric values remain
+                                    $set('sap_id', preg_replace('/^\d{8}[A-Z]{1,2}$/', '', $state));
+                                })
                                 ->required(),
                             Select::make('employee_status_id')
                                 ->options(EmployeeStatus::all()->pluck('name', 'id'))
@@ -344,7 +341,8 @@ class Create extends ModalComponent implements HasForms
                                 ->label('No Kontrak'),
                             TextInput::make('contract_sequence_no')
                                 ->label('Kontrak Ke-')
-                                ->rules('min:1|max:3')
+                                ->minValue(1)
+                                ->maxValue(3)
                                 ->numeric(),
                             DatePicker::make('contract_start')
                                 ->label('Awal Kontrak'),
@@ -361,8 +359,14 @@ class Create extends ModalComponent implements HasForms
                                 ->required(),
                             TextInput::make('account_no')
                                 ->label('Account Number')
+                                ->unique(ignoreRecord: true)
                                 ->required()
-                                ->numeric(),
+                                ->type('text')
+                                ->reactive()
+                                ->afterStateUpdated(function (callable $set, $state) {
+                                    // Ensure only numeric values remain
+                                    $set('account_no', preg_replace('/\D/', '', $state));
+                                }),
                             TextInput::make('account_name')
                                 ->label('Account Holder')
                                 ->required(),
@@ -415,6 +419,7 @@ class Create extends ModalComponent implements HasForms
                                 ->validationAttribute('NPWP')
                                 ->type('text')
                                 ->maxLength(16)
+                                ->unique(ignoreRecord: true)
                                 ->reactive()
                                 ->required()
                                 ->afterStateUpdated(function (callable $set, $state) {
@@ -423,7 +428,7 @@ class Create extends ModalComponent implements HasForms
                                 }),
                             Select::make('status_pasangan')
                                 ->label('Status Pasangan')
-                                ->options(['TK', 'K0', 'K1', 'K2', 'K3'])
+                                ->options(['TK' => 'TK', 'K0' => 'K0', 'K1' => 'K1', 'K2' => 'K2', 'K3' => 'K3'])
                                 ->required(),
                             TextInput::make('jumlah_tanggungan')
                                 ->numeric()
@@ -437,11 +442,30 @@ class Create extends ModalComponent implements HasForms
                                 ->schema([
                                     Select::make('pants_size')
                                         ->label('Pants Size')
-                                        ->options(['S', 'M', 'L', 'XL', 'XXL', 'XXXL', '4XL', '5XL', '6XL', '7XL', '8XL', '9XL'])
+                                        ->options(function (callable $get) {
+                                            $sex = $get('sex');
+
+                                            $options = [];
+                                            // Return different options based on the selected sex
+                                            if ($sex === 'L') {
+                                                // Generate options for male (e.g., 28 - 40 inches)
+                                                for ($i = 28; $i <= 45; $i += 1) {
+                                                    $options[$i] = "{$i} Inch";
+                                                }
+                                            } elseif ($sex === 'P') {
+                                                // Generate options for female (e.g., UK sizes 6 - 18)
+                                                for ($i = 6; $i <= 20; $i += 1) {
+                                                    $options[$i] = "UK {$i}";
+                                                }
+                                            }
+
+                                            return $options;
+                                        })
+                                        ->reactive()
                                         ->required(),
                                     Select::make('shirt_size')
                                         ->label('Shirt Size')
-                                        ->options(['S', 'M', 'L', 'XL', 'XXL', 'XXXL', '4XL', '5XL', '6XL', '7XL', '8XL', '9XL'])
+                                        ->options(['XS' => 'XS', 'S' => 'S', 'M' => 'M', 'L' => 'L', 'XL' => 'XL', 'XXL' => 'XXL', '3XL' => '3XL', '4XL' => '4XL', '5XL' => '5XL', '6XL+' => '6XL+'])
                                         ->required(),
                                 ])
                         ]),
