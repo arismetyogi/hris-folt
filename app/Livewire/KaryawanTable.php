@@ -348,12 +348,6 @@ final class KaryawanTable extends PowerGridComponent
         ];
     }
 
-    #[\Livewire\Attributes\On('edit')]
-    public function edit($rowId): void
-    {
-        $this->js('alert(' . $rowId . ')');
-    }
-
     public function getActions(): array
     {
         return [

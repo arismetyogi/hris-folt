@@ -41,7 +41,18 @@ class Create extends ModalComponent implements HasForms
     {
         return '6xl';
     }
-
+    public static function closeModalOnEscape(): bool
+    {
+        return false;
+    }
+    public static function closeModalOnClickAway(): bool
+    {
+        return false;
+    }
+    public static function closeModalOnEscapeIsForceful(): bool
+    {
+        return false;
+    }
     public function mount(?int $id = null): void
     {
         $this->karyawan = $id ? Karyawan::with(['branch', 'apotek', 'area', 'band', 'bank', 'empLevel', 'empStatus', 'gradeEselon', 'jabatan', 'subjabatan', 'recruitment', 'zip', 'statusDesc'])->find($id) : null;
@@ -138,6 +149,7 @@ class Create extends ModalComponent implements HasForms
                             TextInput::make('phone')
                                 ->label('Nomor Telepon')
                                 ->tel()
+                                ->reactive()
                                 ->prefix('+62')
                                 ->placeholder('81234567890')
                                 ->required(),
@@ -248,29 +260,32 @@ class Create extends ModalComponent implements HasForms
                                 ->required(),
                             TextInput::make('sap_id')
                                 ->label('ID SAP')
+                                ->validationAttribute('ID SAP')
                                 ->required()
                                 ->unique(ignoreRecord: true)
                                 ->type('text')
                                 ->maxLength(13)
+                                ->reactive()
                                 ->afterStateUpdated(function (callable $set, $state) {
-                                    // Ensure only numeric values remain
                                     $set('sap_id', preg_replace('/\D/', '', $state));
                                 })
                                 ->rules(['required', 'regex:/^(\d{8}|\d{13})$/']),
                             TextInput::make('npp')
                                 ->label('NPP')
                                 ->validationAttribute('NPP')
+                                ->required()
                                 ->unique(ignoreRecord: true)
-                                ->live()
                                 ->type('text')
                                 ->maxLength(10)
                                 ->placeholder('19990101A')
-                                ->rules(['regex:/^\d{8}[A-Z]{1,2}$/'])
+                                ->reactive()
                                 ->afterStateUpdated(function (callable $set, $state) {
-                                    // Ensure only numeric values remain
-                                    $set('sap_id', preg_replace('/^\d{8}[A-Z]{1,2}$/', '', $state));
+                                    // Ensure the input only contains the expected format, removing invalid characters
+                                    if (preg_match('/^\d{8}[A-Z]{1,2}$/', $state, $matches)) {
+                                        $set('npp', $matches[0]); // Set the matched value back
+                                    }
                                 })
-                                ->required(),
+                                ->rules(['regex:/^\d{8}[A-Z]{1,2}$/']),
                             Select::make('employee_status_id')
                                 ->options(EmployeeStatus::all()->pluck('name', 'id'))
                                 ->label('Employee Status')
