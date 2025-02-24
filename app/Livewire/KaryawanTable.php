@@ -39,7 +39,7 @@ final class KaryawanTable extends PowerGridComponent
         $this->showCheckBox();
 
         return [
-            PowerGrid::exportable('master_apotek')
+            PowerGrid::exportable('data-karyawan')
                 ->columnWidth([
                     2 => 30,
                 ])

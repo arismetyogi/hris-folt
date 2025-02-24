@@ -17,6 +17,6 @@ name('payrolls.index');
     />
 
     <div class="py-12">
-        @livewire('karyawan-table')
+        @livewire('payroll-table')
     </div>
 </x-layouts.app>

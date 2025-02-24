@@ -3,11 +3,13 @@
 namespace App\Livewire;
 
 use App\Enums\Roles;
+use App\Models\Karyawan;
 use App\Models\Payroll;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Carbon;
 use PowerComponents\LivewirePowerGrid\Button;
 use PowerComponents\LivewirePowerGrid\Column;
+use PowerComponents\LivewirePowerGrid\Components\SetUp\Exportable;
 use PowerComponents\LivewirePowerGrid\Facades\Filter;
 use PowerComponents\LivewirePowerGrid\Facades\PowerGrid;
 use PowerComponents\LivewirePowerGrid\PowerGridComponent;
@@ -22,7 +24,13 @@ final class PayrollTable extends PowerGridComponent
         $this->showCheckBox();
 
         return [
+            PowerGrid::exportable('data-payroll')
+                ->columnWidth([
+                    2 => 30,
+                ])
+                ->type(Exportable::TYPE_XLS, Exportable::TYPE_CSV),
             PowerGrid::header()
+                ->includeViewOnTop('components.pg-tops.karyawan')
                 ->showSearchInput(),
             PowerGrid::footer()
                 ->showPerPage()
@@ -34,7 +42,7 @@ final class PayrollTable extends PowerGridComponent
     {
         $user = auth()->user();
         if ($user->hasRole(Roles::SuperAdmin->value)) {
-            return Payroll::query()->with('karyawan');
+            return Payroll::query()->with('karyawan:id,nama');
         } else {
             return Payroll::query()->with('karyawan')->whereHas('karyawan', function ($query) use ($user) {
                 $query->where('branch_id', $user->branch_id);
@@ -44,7 +52,11 @@ final class PayrollTable extends PowerGridComponent
 
     public function relationSearch(): array
     {
-        return [];
+        return [
+            'karyawan' => [
+                'name', 'npp','sap_id'
+            ]
+        ];
     }
 
     public function fields(): PowerGridFields
