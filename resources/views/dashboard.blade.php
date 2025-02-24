@@ -2,7 +2,7 @@
 
     <x-app.heading
         title="Dashboard"
-        description="Welcome to an example application dashboard. Find more resources below."
+        description="Welcome to HRIS dashboard. Find more resources below."
         :border="false"
     />
 
@@ -16,7 +16,7 @@
 
                     <div class="flex flex-col w-full mt-5 space-y-5 md:flex-row md:space-y-0 md:mb-0 md:space-x-5">
                         <x-app.dashboard-card
-                            href="https://github.com/arismetyogi/larawire"
+                            href="https://github.com/arismetyogi/hris-folt"
                             target="_blank"
                             title="Github Repo"
                             description="View the source code and submit a Pull Request"
