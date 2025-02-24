@@ -29,7 +29,7 @@ final class PayrollTable extends PowerGridComponent
                 ])
                 ->type(Exportable::TYPE_XLS, Exportable::TYPE_CSV),
             PowerGrid::header()
-                ->includeViewOnTop('components.pg-tops.karyawan')
+                ->includeViewOnTop('components.pg-tops.payroll')
                 ->showSearchInput(),
             PowerGrid::footer()
                 ->showPerPage()
